@@ -1,10 +1,14 @@
-﻿import PIL.Image as Image
+﻿import math
+
+import PIL.Image as Image
 from pygame.locals import *
 import OpenGL.GL as gl
 import pygame
 
 from core.live2d import *
 from core.live2d_gl_wrapper import Live2DGLWrapper
+from core.live2d_model_opengl import Live2DModelOpenGL
+from core.util import UtSystem
 
 
 class ModelDef:
@@ -33,21 +37,21 @@ def loadImage(filePath):
     return texture
 
 
-name = "kasumi"
-modelDef = ModelDef(
-    f"../test-data/{name}.moc",
-    [f"../test-data/{name}.png"]
-)
+# name = "kasumi"
+# modelDef = ModelDef(
+#     f"../test-data/{name}.moc",
+#     [f"../test-data/{name}.png"]
+# )
 
 # rendering does not work properly for this model
-# modelDef = ModelDef(
-#     "../resources/haru/haru.moc",
-#     [
-#         "../resources/haru/haru.1024/texture_00.png",
-#         "../resources/haru/haru.1024/texture_01.png",
-#         "../resources/haru/haru.1024/texture_02.png",
-#     ]
-# )
+modelDef = ModelDef(
+    "../resources/haru/haru.moc",
+    [
+        "../resources/haru/haru.1024/texture_00.png",
+        "../resources/haru/haru.1024/texture_01.png",
+        "../resources/haru/haru.1024/texture_02.png",
+    ]
+)
 
 SCR_WIDTH = 600
 SCR_HEIGHT = 600

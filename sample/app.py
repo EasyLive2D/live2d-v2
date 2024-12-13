@@ -1,9 +1,9 @@
 ﻿import pygame
 
-from LAppModel import LAppModel
-from PlatformManager import PlatformManager
 import LAppDefine
+from LAppModel import LAppModel
 from MatrixStack import MatrixStack
+from PlatformManager import PlatformManager
 from core.live2d import Live2D
 from core.live2d_gl_wrapper import Live2DGLWrapper
 from framework.Live2DFramework import Live2DFramework, L2DTargetPoint, L2DViewMatrix, L2DMatrix44
@@ -22,7 +22,7 @@ Live2DFramework.setPlatformManager(PlatformManager())
 
 model = LAppModel()
 
-name = "haru"
+name = "kasumi2"
 model.load(f"../resources/{name}/{name}.model.json")
 
 dragMgr = L2DTargetPoint()
@@ -61,7 +61,9 @@ def lookFront():
 
     dragMgr.setPoint(0.0, 0.0)
 
+
 scaling = 1
+
 
 def mouseEvent(e):
     global scaling
@@ -83,6 +85,7 @@ def mouseEvent(e):
         dragMgr.setPoint(vx, vy)
     elif e.type == pygame.MOUSEBUTTONUP:
         model.startRandomMotion(priority=LAppDefine.PRIORITY_FORCE)
+
 
 running = True
 while True:
@@ -116,5 +119,3 @@ while True:
 
 Live2D.dispose()
 pygame.quit()
-
-

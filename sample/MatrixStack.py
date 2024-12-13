@@ -1,4 +1,4 @@
-from core.live2d import Array
+from core.type.array import Array
 
 
 class MatrixStack:

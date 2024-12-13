@@ -2,7 +2,7 @@
 
 from PIL import Image
 
-from core.live2d import Live2DModelOpenGL
+from core.live2d_model_opengl import Live2DModelOpenGL
 import OpenGL.GL as gl
 
 

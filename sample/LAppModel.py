@@ -3,7 +3,7 @@ from random import random, choice
 
 import LAppDefine
 from MatrixStack import MatrixStack
-from core.live2d import UtSystem
+from core.util import UtSystem
 from ModelSettingJson import ModelSettingJson
 from framework.Live2DFramework import L2DBaseModel, L2DEyeBlink, Live2DFramework
 
@@ -90,7 +90,6 @@ class LAppModel(L2DBaseModel):
         self.mainMotionManager.stopAllMotions()
         self.setUpdating(False)
         self.setInitialized(True)
-        self.live2DModel.setPremultipliedAlpha(False)
 
     def release(self, gl):
         pm = Live2DFramework.getPlatformManager()

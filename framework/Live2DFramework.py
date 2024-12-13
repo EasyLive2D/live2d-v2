@@ -1,9 +1,11 @@
 import math
-
-from core.live2d import UtSystem, Live2D, Live2DMotion, AMotion, Array, Float32Array, MotionQueueManager, PartsDataID, \
-    PhysicsHair
-
 import random
+
+from core.type.array import Float32Array, Array
+from core.physics import PhysicsHair
+from core.util import UtSystem
+from core.motion import AMotion, Live2DMotion, MotionQueueManager
+from core.id.parts_data_id import PartsDataID
 
 
 class L2DBaseModel:
@@ -156,7 +158,6 @@ class L2DBaseModel:
         right = 0
         top = self.live2DModel.getCanvasHeight()
         bottom = 0
-        # for(j = 0; j < points.length; j = j + 2):
         for j in range(0, len(points), 2):
             x = points[j]
             y = points[j + 1]
@@ -171,7 +172,7 @@ class L2DBaseModel:
 
         tx = self.modelMatrix.invertTransformX(testX)
         ty = self.modelMatrix.invertTransformY(testY)
-        return (left <= tx and tx <= right and top <= ty and ty <= bottom)
+        return left <= tx <= right and top <= ty <= bottom
 
 
 class L2DExpressionMotion(AMotion):
@@ -185,7 +186,6 @@ class L2DExpressionMotion(AMotion):
         self.paramList = Array()
 
     def updateParamExe(self, model, timeMSec, weight, motionQueueEnt):
-        # for(i = len(this.paramList) - 1; i >= 0; --i):
         for i in range(len(self.paramList) - 1, -1, -1):
             param = self.paramList[i]
             if param.type == L2DExpressionMotion.TYPE_ADD:
@@ -208,12 +208,10 @@ class L2DExpressionMotion(AMotion):
         params = js["params"]
         paramNum = len(params)
         ret.paramList = []
-        # for(i = 0; i < paramNum; i++):
         for i in range(0, paramNum, 1):
             param = params[i]
             paramID = str(param["id"])
             value = float(param["val"])
-            calcTypeInt = L2DExpressionMotion.TYPE_ADD
             calc = str(param.get("calc", "add"))
             if calc == "add":
                 calcTypeInt = L2DExpressionMotion.TYPE_ADD
@@ -268,7 +266,7 @@ class L2DEyeBlink:
     def calcNextBlink(self):
         time = UtSystem.getUserTimeMSec()
         r = random.random()
-        return (time + r * (2 * self.blinkIntervalMsec - 1))
+        return time + r * (2 * self.blinkIntervalMsec - 1)
 
     def setInterval(self, blinkIntervalMsec):
         self.blinkIntervalMsec = blinkIntervalMsec
@@ -340,7 +338,7 @@ class EYE_STATE:
     STATE_OPENING = "STATE_OPENING"
 
 
-class L2DMatrix44():
+class L2DMatrix44:
 
     def __init__(self):
         self.tr = Float32Array(16)
@@ -541,14 +539,14 @@ class L2DPhysics():
             for j in range(srcNum):
                 src = srcList[j]
                 id = src.get("id")
-                type = PhysicsHair.Src.SRC_TO_X
+                type = PhysicsHair.SRC_TO_X
                 typeStr = src.get("ptype")
                 if typeStr == "x":
-                    type = PhysicsHair.Src.SRC_TO_X
+                    type = PhysicsHair.SRC_TO_X
                 elif typeStr == "y":
-                    type = PhysicsHair.Src.SRC_TO_Y
+                    type = PhysicsHair.SRC_TO_Y
                 elif typeStr == "angle":
-                    type = PhysicsHair.Src.SRC_TO_G_ANGLE
+                    type = PhysicsHair.SRC_TO_G_ANGLE
                 else:
                     raise Exception("error")
 
@@ -561,12 +559,12 @@ class L2DPhysics():
             for j in range(targetNum):
                 target = targetList[j]
                 id = target.get("id")
-                type = PhysicsHair.Target.TARGET_FROM_ANGLE
+                type = PhysicsHair.TARGET_FROM_ANGLE
                 typeStr = target.get("ptype")
                 if typeStr == "angle":
-                    type = PhysicsHair.Target.TARGET_FROM_ANGLE
+                    type = PhysicsHair.TARGET_FROM_ANGLE
                 elif typeStr == "angle_v":
-                    type = PhysicsHair.Target.TARGET_FROM_ANGLE_V
+                    type = PhysicsHair.TARGET_FROM_ANGLE_V
                 else:
                     raise Exception("live2d", "Invalid parameter:PhysicsHair.Target")
 
@@ -579,7 +577,7 @@ class L2DPhysics():
         return ret
 
 
-class L2DPose():
+class L2DPose:
 
     def __init__(self):
         self.lastTime = 0
@@ -587,9 +585,7 @@ class L2DPose():
         self.partsGroups = Array()
 
     def updateParam(self, model):
-        if model == None:
-            return
-        if not (model == self.lastModel):
+        if model != self.lastModel:
             self.initParam(model)
 
         self.lastModel = model
@@ -603,8 +599,6 @@ class L2DPose():
             self.copyOpacityOtherParts(model, self.partsGroups[i])
 
     def initParam(self, model):
-        if model == None:
-            return
         for i in range(len(self.partsGroups)):
             partsGroup = self.partsGroups[i]
             for j in range(len(partsGroup)):
@@ -616,7 +610,7 @@ class L2DPose():
                 v = (model.getParamFloat(paramIndex) != 0)
                 model.setPartsOpacity(partsIndex, (1.0 if v else 0.0))
                 model.setParamFloat(paramIndex, (1.0 if v else 0.0))
-                if partsGroup[j].link == None:
+                if partsGroup[j].link is None:
                     continue
                 for k in range(len(partsGroup[j].link)):
                     partsGroup[j].link[k].initIndex(model)
@@ -713,7 +707,7 @@ class L2DPose():
         return ret
 
 
-class L2DPartsParam():
+class L2DPartsParam:
 
     def __init__(self, id):
         self.paramIndex = -1
@@ -727,7 +721,7 @@ class L2DPartsParam():
         model.setParamFloat(self.paramIndex, 1)
 
 
-class L2DTargetPoint():
+class L2DTargetPoint:
     FRAME_RATE = 30
 
     def __init__(self):
@@ -889,7 +883,7 @@ class L2DViewMatrix(L2DMatrix44):
         return self.maxTop
 
 
-class Live2DFramework():
+class Live2DFramework:
     platformManager = None
 
     @staticmethod

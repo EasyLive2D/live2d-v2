@@ -1,0 +1,1 @@
+﻿from .live2d_object_factory import Live2DObjectFactory
