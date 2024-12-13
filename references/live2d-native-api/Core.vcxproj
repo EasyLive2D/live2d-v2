@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ALive2DModel.h" />
+    <ClInclude Include="avatar\AvatarPartsItem.h" />
+    <ClInclude Include="base\BDAffine.h" />
+    <ClInclude Include="base\BDBoxGrid.h" />
+    <ClInclude Include="base\IBaseContext.h" />
+    <ClInclude Include="base\IBaseData.h" />
+    <ClInclude Include="base\private\AffineEnt.h" />
+    <ClInclude Include="DEF.h" />
+    <ClInclude Include="draw\DDTexture.h" />
+    <ClInclude Include="draw\IDrawContext.h" />
+    <ClInclude Include="draw\IDrawData.h" />
+    <ClInclude Include="graphics\ClippingManagerOpenGL.h" />
+    <ClInclude Include="graphics\DrawParam.h" />
+    <ClInclude Include="graphics\DrawParam_OpenGLES2.h" />
+    <ClInclude Include="graphics\DrawProfileCocos2D.h" />
+    <ClInclude Include="graphics\Live2DShaderOpenGLES2.h" />
+    <ClInclude Include="graphics\UtOpenGLDebug.h" />
+    <ClInclude Include="id\BaseDataID.h" />
+    <ClInclude Include="id\DrawDataID.h" />
+    <ClInclude Include="id\ID.h" />
+    <ClInclude Include="id\ParamID.h" />
+    <ClInclude Include="id\PartsDataID.h" />
+    <ClInclude Include="io\BReader.h" />
+    <ClInclude Include="io\ByteBuffer.h" />
+    <ClInclude Include="io\data\Arrays2D.h" />
+    <ClInclude Include="io\FileFormat2.h" />
+    <ClInclude Include="io\ISerializableV2.h" />
+    <ClInclude Include="io\RefString.h" />
+    <ClInclude Include="Live2D.h" />
+    <ClInclude Include="Live2DModelAndroidES2.h" />
+    <ClInclude Include="Live2DModelIPhoneES2.h" />
+    <ClInclude Include="Live2DModelOpenGL.h" />
+    <ClInclude Include="Live2DModelWinGL.h" />
+    <ClInclude Include="memory\AMemoryHolder.h" />
+    <ClInclude Include="memory\APageHeader.h" />
+    <ClInclude Include="memory\fixed\MemoryHolderFixed.h" />
+    <ClInclude Include="memory\fixed\MHPageHeaderFixed.h" />
+    <ClInclude Include="memory\LDAllocator.h" />
+    <ClInclude Include="memory\LDObject.h" />
+    <ClInclude Include="memory\LDUnmanagedObject.h" />
+    <ClInclude Include="memory\MemoryParam.h" />
+    <ClInclude Include="memory\tmp\MemoryHolderTmp.h" />
+    <ClInclude Include="memory\tmp\MHBin.h" />
+    <ClInclude Include="memory\tmp\MHPageHeaderTmp.h" />
+    <ClInclude Include="memory\UtMemory.h" />
+    <ClInclude Include="ModelContext.h" />
+    <ClInclude Include="model\ModelImpl.h" />
+    <ClInclude Include="model\PartsData.h" />
+    <ClInclude Include="model\UtModel.h" />
+    <ClInclude Include="motion\AMotion.h" />
+    <ClInclude Include="motion\EyeBlinkMotion.h" />
+    <ClInclude Include="motion\Live2DMotion.h" />
+    <ClInclude Include="motion\Live2DMotionBin.h" />
+    <ClInclude Include="motion\MotionQueueEnt.h" />
+    <ClInclude Include="motion\MotionQueueManager.h" />
+    <ClInclude Include="param\ParamDefFloat.h" />
+    <ClInclude Include="param\ParamDefSet.h" />
+    <ClInclude Include="param\ParamPivots.h" />
+    <ClInclude Include="param\PivotManager.h" />
+    <ClInclude Include="physics\PhysicsHair.h" />
+    <ClInclude Include="physics\PhysicsParams.h" />
+    <ClInclude Include="type\LDAffineTransform.h" />
+    <ClInclude Include="type\LDColor.h" />
+    <ClInclude Include="type\LDMap.h" />
+    <ClInclude Include="type\LDMatrix44.h" />
+    <ClInclude Include="type\LDPoint.h" />
+    <ClInclude Include="type\LDPointF.h" />
+    <ClInclude Include="type\LDRect.h" />
+    <ClInclude Include="type\LDRectF.h" />
+    <ClInclude Include="type\LDString.h" />
+    <ClInclude Include="type\LDVector.h" />
+    <ClInclude Include="util\Json.h" />
+    <ClInclude Include="util\UtArray.h" />
+    <ClInclude Include="util\UtDebug.h" />
+    <ClInclude Include="util\UtFile.h" />
+    <ClInclude Include="util\UtInterpolate.h" />
+    <ClInclude Include="util\UtMath.h" />
+    <ClInclude Include="util\UtMotion.h" />
+    <ClInclude Include="util\UtOS_iPhone.h" />
+    <ClInclude Include="util\UtString.h" />
+    <ClInclude Include="util\UtSystem.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{BCFEE4D4-0BF3-4F8F-8639-1E2F83273FC3}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>live2d</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions);L2D_TARGET_WIN_GL;</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

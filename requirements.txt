@@ -1,0 +1,4 @@
+﻿PyOpenGL~=3.1.7
+numpy~=2.2.0
+pygame~=2.6.1
+pillow~=11.0.0
