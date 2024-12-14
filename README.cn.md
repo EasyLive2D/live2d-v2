@@ -2,9 +2,9 @@
 
 [English](./README.md)
 
-这是一个将 **Cubism 2.1** Web SDK（JavaScript）完全翻译为纯 Python 的项目。这意味着使用 Live2D 将变得更加简单，无需烦人的环境配置或处理依赖缺失问题。
+这是一个将 **Cubism 2.1** Web SDK（JavaScript）完全翻译为纯 Python 实现的项目，无 JS 运行时和 CPP 封装。
 
-只需要安装以下依赖即可：
+运行只需要安装以下依赖即可：
 
 ```
 PyOpenGL  # 渲染 
@@ -15,13 +15,14 @@ pillow # 加载纹理
 
 ## 性能
 
-目前，这个项目“至少能跑起来”。  
+目前，这个项目“至少能跑起来”。
 
-仍有许多性能优化工作需要完成，例如用 numpy 替换纯 Python 的计算逻辑。  
+仍有许多性能优化工作需要完成，例如用 numpy 替换纯 Python 的计算逻辑。
 
 由于核心代码是从混淆过的 `live2d.min.js` 翻译而来，代码可能不够整洁和易于理解。
 
 ## 项目结构
+
 ```
 |-- core # live2d.min.js（Cubism 2.1）的 Python 实现 
 |-- framework # Cubism 2.1 Web Framework 的 Python 实现 
@@ -33,7 +34,9 @@ pillow # 加载纹理
 
 ```
 
-## 使用方法
+## 快速入门
+
+安装 `requirements.txt` 中的依赖，然后运行下面的任何一个文件即可：
 
 简单示例：[simple.py](main/simple.py)
 

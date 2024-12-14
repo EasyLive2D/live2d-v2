@@ -2,9 +2,10 @@
 
 [中文](./README.cn.md)
 
-This is a translation project from **Cubism 2.1** Web SDK (JavaScript) to pure Python, which means it will be quite easy to use Live2D without the annoying environment setup or missing dependencies. 
+This is a translation project from **Cubism 2.1** Web SDK (JavaScript) to pure Python, without using any Javascript runtime or c++ bindings.
 
-All you need is just to install:
+Just a few dependencies are needed:
+
 ```
 PyOpenGL # rendering
 numpy # data transmission from Python to OpenGL
@@ -14,11 +15,11 @@ pillow # loading textures
 
 ## Performance
 
-At least, it works.  
+At least, it works.
 
-A lot of work needs to be done for performance improvements, such as replacing pure python calculation with numpy.  
+A lot of work needs to be done for performance improvements, such as replacing pure python calculation with numpy.
 
-Since the core code is translated from the obfuscated `live2d.min.js`, the code may not be tidy and understandable. 
+Since the core code is translated from the obfuscated `live2d.min.js`, the code may not be tidy and understandable.
 
 ## Project Structure
 
@@ -32,7 +33,10 @@ Since the core code is translated from the obfuscated `live2d.min.js`, the code 
 |-- sample     # Usage examples
 |-- test-data  # Models for simple.py
 ```
-## Usage
+
+## Quick Start
+
+Install dependencies in `requirements.txt` and run either of the following:
 
 A simple example: [simple.py](main/simple.py)
 
@@ -43,7 +47,8 @@ A more comprehensive example: [app.py](main/app.py)
 - JavaScript to Python translation is primarily done by [JSConvert](https://github.com/JonBoynton/JSConvert).
 - MOC data exploration is facilitated by [FreeLive](https://github.com/NiaBie/FreeLive).
 - Most deobfuscation work is done by [de4js](https://github.com/lelinhtinh/de4js).
-- Cubism: For their incredible work in developing a robust framework for interactive 2D character animations, which inspired and enabled this project.
+- Cubism: For their incredible work in developing a robust framework for interactive 2D character animations, which
+  inspired and enabled this project.
 
 ## Disclaimer
 
