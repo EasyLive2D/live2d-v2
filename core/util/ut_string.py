@@ -1,12 +1,12 @@
 ﻿class UtString:
     @staticmethod
-    def startswith(s: str, offset: int, pat: str) -> bool:
+    def startswith(s: str | bytes, offset: int, pat: str) -> bool:
         end_pos = offset + len(pat)
         if end_pos >= len(s):
             return False
 
         for i in range(offset, end_pos, 1):
-            if s[i] != pat[i - offset]:
+            if chr(s[i]) != pat[i - offset]:
                 return False
 
         return True

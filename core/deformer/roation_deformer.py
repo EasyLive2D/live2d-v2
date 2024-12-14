@@ -47,17 +47,17 @@ class RotationDeformer(Deformer):
         if not (self == deformerContext.getDeformer()):
             raise RuntimeError("context not match")
 
-        if not self.pivotManager.Ur_(modelContext):
+        if not self.pivotManager.checkParamUpdated(modelContext):
             return
 
         success = RotationDeformer.success
         success[0] = False
-        a2 = self.pivotManager.Q2_(modelContext, success)
+        a2 = self.pivotManager.calcPivotValues(modelContext, success)
         deformerContext.setOutsideParam(success[0])
         self.interpolateOpacity(modelContext, self.pivotManager, deformerContext, success)
         a3 = modelContext.getTempPivotTableIndices()
         ba = modelContext.getTempT()
-        self.pivotManager.zr_(a3, ba, a2)
+        self.pivotManager.calcPivotIndices(a3, ba, a2)
         if a2 <= 0:
             bn_3 = self.affines[a3[0]]
             deformerContext.interpolatedAffine.init(bn_3)

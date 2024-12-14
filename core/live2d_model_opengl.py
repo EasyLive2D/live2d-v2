@@ -1,54 +1,52 @@
 ﻿from core.alive2d_model import ALive2DModel
 from core.graphics import DrawParamOpenGL
-from core.live2d import Live2D
 
 
 class Live2DModelOpenGL(ALive2DModel):
 
-    def __init__(self, aH):
+    def __init__(self):
         super().__init__()
-        self.drawParamWebGL = DrawParamOpenGL(aH)
-        self.drawParamWebGL.setGL(Live2D.getGL(aH))
+        self.drawParamGL = DrawParamOpenGL()
 
-    def setGL(self, aH):
-        Live2D.setGL(aH)
+    def resize(self, ww, wh):
+        self.drawParamGL.resize(ww, wh)
 
     def setTransform(self, aH):
-        self.drawParamWebGL.setTransform(aH)
+        self.drawParamGL.setTransform(aH)
 
     def update(self):
         self.modelContext.update()
-        self.modelContext.preDraw(self.drawParamWebGL)
+        self.modelContext.preDraw(self.drawParamGL)
 
     def draw(self):
-        self.modelContext.draw(self.drawParamWebGL)
+        self.modelContext.draw(self.drawParamGL)
 
     def getDrawParam(self):
-        return self.drawParamWebGL
+        return self.drawParamGL
 
     def setMatrix(self, aH):
-        self.drawParamWebGL.setMatrix(aH)
+        self.drawParamGL.setMatrix(aH)
 
     def setPremultipliedAlpha(self, aH):
-        self.drawParamWebGL.setPremultipliedAlpha(aH)
+        self.drawParamGL.setPremultipliedAlpha(aH)
 
     def isPremultipliedAlpha(self):
-        return self.drawParamWebGL.isPremultipliedAlpha()
+        return self.drawParamGL.isPremultipliedAlpha()
 
     def setAnisotropy(self, aH):
-        self.drawParamWebGL.setAnisotropy(aH)
+        self.drawParamGL.setAnisotropy(aH)
 
     def getAnisotropy(self):
-        return self.drawParamWebGL.getAnisotropy()
+        return self.drawParamGL.getAnisotropy()
 
     @staticmethod
-    def loadModel(aI, aK=0):
-        aH = Live2DModelOpenGL(aK)
+    def loadModel(aI):
+        aH = Live2DModelOpenGL()
         ALive2DModel.loadModel_exe(aH, aI)
         return aH
 
     def setTexture(self, aI, aH):
-        if self.drawParamWebGL is None:
-            print("_Yi for QT ki_ / XS_() is _6 ui_!!")
+        if self.drawParamGL is None:
+            raise RuntimeError("current gl is none")
 
-        self.drawParamWebGL.setTexture(aI, aH)
+        self.drawParamGL.setTexture(aI, aH)

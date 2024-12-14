@@ -19,8 +19,7 @@ class ClippingManagerOpenGL:
         self.colorBuffer = 0
         self.isInitGLFBFunc = False
         self.tmpBoundsOnModel = ClipRectF()
-        if len(Live2D.glContext) > len(Live2D.frameBuffers):
-            self.curFrameNo = self.getMaskRenderTexture()
+        self.genMaskRenderTexture()
         self.tmpModelToViewMatrix = ClipMatrix()
         self.tmpMatrix2 = ClipMatrix()
         self.tmpMatrixForMask = ClipMatrix()
@@ -78,10 +77,8 @@ class ClippingManagerOpenGL:
             aP = aL[aM]
             aP.clipBufPre_clipContext = aJ
 
-    def getMaskRenderTexture(self):
-        aH = self.dpGL.createFramebuffer()
-        Live2D.frameBuffers[self.dpGL.glnr] = aH
-        return self.dpGL.glnr
+    def genMaskRenderTexture(self):
+        self.dpGL.createFramebuffer()
 
     def setupClip(self, a1, aQ):
         aK = 0
@@ -100,7 +97,7 @@ class ClippingManagerOpenGL:
             aW[3] = aQ.gl.height
             aQ.gl.viewport(0, 0, Live2D.clippingMaskBufferSize, Live2D.clippingMaskBufferSize)
             self.setupLayoutBounds(aK)
-            aQ.gl.bindFramebuffer(aQ.gl.FRAMEBUFFER, Live2D.frameBuffers[self.curFrameNo].framebuffer)
+            aQ.gl.bindFramebuffer(aQ.gl.FRAMEBUFFER, aQ.framebufferObject.framebuffer)
             aQ.gl.clearColor(0, 0, 0, 0)
             aQ.gl.clear(aQ.gl.COLOR_BUFFER_BIT)
             for aO in range(0, len(self.clipContextList), 1):

@@ -10,4 +10,4 @@ class TextureInfo:
         self.b = 1
         self.scale = 1
         self.interpolate = 1
-        self.blendMode = Live2D.L2D_COLOR_BLEND_MODE_MULT
+        self.blendMode = 0

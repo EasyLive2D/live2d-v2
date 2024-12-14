@@ -2,28 +2,23 @@
 
 
 class MotionQueueEntry:
+    MQ_NO = 0
 
     def __init__(self):
-        self.w0_ = None
-        self.AT_ = True
-        self._9L = False
-        self.z2_ = -1
-        self.bs_ = -1
-        self.Do_ = -1
-        self.sr_ = None
-        self.sr_ = MotionQueueEntry.Gs_
-        MotionQueueEntry.Gs_ += 1
+        self.motion = None
+        self.available = True
+        self.finished = False
+        self.startTimeMSec = -1
+        self.fadeInStartTimeMSec = -1
+        self.endTimeMSec = -1
+        self.mqNo = MotionQueueEntry.MQ_NO
+        MotionQueueEntry.MQ_NO += 1
 
     def isFinished(self):
-        return self._9L
+        return self.finished
 
-    def qS_(self, aJ):
-        aI = UtSystem.getUserTimeMSec()
-        aH = aI + aJ
-        if self.Do_ < 0 or aH < self.Do_:
-            self.Do_ = aH
-
-    def Bs_(self):
-        return self.sr_
-
-    Gs_ = 0
+    def startFadeOut(self, fadeOutMSec):
+        ct = UtSystem.getUserTimeMSec()
+        new_end_time_m_sec = ct + fadeOutMSec
+        if self.endTimeMSec < 0 or new_end_time_m_sec < self.endTimeMSec:
+            self.endTimeMSec = new_end_time_m_sec

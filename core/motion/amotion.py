@@ -1,38 +1,30 @@
-﻿from core.util.ut_motion import UtMotion
+﻿from abc import ABC, abstractmethod
+
 from core.util import UtSystem
+from core.util.ut_motion import UtMotion
 
 
-class AMotion:
+class AMotion(ABC):
 
     def __init__(self):
-        self.dP_ = None
-        self.eo_ = None
-        self.V0_ = None
-        self.dP_ = 1000
-        self.eo_ = 1000
-        self.V0_ = 1
-        self.a0_()
-
-    def a0_(self):
-        pass
+        self.fadeInMSec = 1000
+        self.fadeOutMSec = 1000
+        self.weight = 1
 
     def setFadeIn(self, aH):
-        self.dP_ = aH
+        self.fadeInMSec = aH
 
     def setFadeOut(self, aH):
-        self.eo_ = aH
+        self.fadeOutMSec = aH
 
-    def pT_(self, aH):
-        self.V0_ = aH
+    def setWeight(self, aH):
+        self.weight = aH
 
     def getFadeOut(self):
-        return self.eo_
+        return self.fadeOutMSec
 
-    def _4T(self):
-        return self.eo_
-
-    def mT_(self):
-        return self.V0_
+    def getWeight(self):
+        return self.weight
 
     def getDurationMSec(self):
         return -1
@@ -41,35 +33,36 @@ class AMotion:
         return -1
 
     def updateParam(self, aJ, aN):
-        if not aN.AT_ or aN._9L:
+        if not aN.available or aN.finished:
             return
 
         aL = UtSystem.getUserTimeMSec()
-        if aN.z2_ < 0:
-            aN.z2_ = aL
-            aN.bs_ = aL
+        if aN.startTimeMSec < 0:
+            aN.startTimeMSec = aL
+            aN.fadeInStartTimeMSec = aL
             aM = self.getDurationMSec()
-            if aN.Do_ < 0:
-                aN.Do_ = -1 if (aM <= 0) else aN.z2_ + aM
+            if aN.endTimeMSec < 0:
+                aN.endTimeMSec = -1 if (aM <= 0) else aN.startTimeMSec + aM
 
-        aI = self.V0_
-        aH = 1 if (self.dP_ == 0) else UtMotion.r2_(((aL - aN.bs_) / self.dP_))
-        aK = 1 if (self.eo_ == 0 or aN.Do_ < 0) else UtMotion.r2_(((aN.Do_ - aL) / self.eo_))
+        aI = self.weight
+        aH = 1 if (self.fadeInMSec == 0) else UtMotion.r2_(((aL - aN.fadeInStartTimeMSec) / self.fadeInMSec))
+        aK = 1 if (self.fadeOutMSec == 0 or aN.endTimeMSec < 0) else UtMotion.r2_(((aN.endTimeMSec - aL) / self.fadeOutMSec))
         aI = aI * aH * aK
         if not (0 <= aI <= 1):
             print("### assert!! ### ")
 
         self.updateParamExe(aJ, aL, aI, aN)
-        if 0 < aN.Do_ < aL:
-            aN._9L = True
+        if 0 < aN.endTimeMSec < aL:
+            aN.finished = True
 
+    @abstractmethod
     def updateParamExe(self, aH, aI, aJ, aK):
         pass
 
     @staticmethod
-    def JT_(aP, aN, aO):
-        aQ = aP / aN
-        a1 = aO / aN
+    def getEasing(t, totalTime, accelerateTime):
+        aQ = t / totalTime
+        a1 = accelerateTime / totalTime
         aU = a1
         aZ = 1 / 3
         aR = 2 / 3

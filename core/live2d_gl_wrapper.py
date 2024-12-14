@@ -51,7 +51,11 @@ class Live2DGLWrapper:
     DEPTH_BUFFER_BIT = gl.GL_DEPTH_BUFFER_BIT
     ONE_MINUS_SRC_COLOR = gl.GL_ONE_MINUS_SRC_COLOR
 
-    def __init__(self, w, h):
+    def __init__(self):
+        self.width = 0
+        self.height = 0
+
+    def resize(self, w, h):
         self.width = w
         self.height = h
 
@@ -248,3 +252,19 @@ class Live2DGLWrapper:
     @staticmethod
     def deleteShader(s):
         gl.glDeleteShader(s)
+
+    @staticmethod
+    def deleteTexture(t):
+        gl.glDeleteTextures(1, t)
+
+    @staticmethod
+    def deleteBuffer(b):
+        gl.glDeleteBuffers(1, b)
+
+    @staticmethod
+    def deleteProgram(p):
+        gl.glDeleteProgram(p)
+
+    @staticmethod
+    def deleteRenderbuffer(r):
+        gl.glDeleteRenderbuffers(1, r)

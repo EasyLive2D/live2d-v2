@@ -1,12 +1,11 @@
 ﻿import math
 
-import PIL.Image as Image
-from pygame.locals import *
 import OpenGL.GL as gl
+import PIL.Image as Image
 import pygame
+from pygame.locals import *
 
 from core.live2d import *
-from core.live2d_gl_wrapper import Live2DGLWrapper
 from core.live2d_model_opengl import Live2DModelOpenGL
 from core.util import UtSystem
 
@@ -60,7 +59,6 @@ pygame.init()
 pygame.display.set_mode((SCR_WIDTH, SCR_HEIGHT), pygame.DOUBLEBUF | pygame.OPENGL)
 
 Live2D.init()
-Live2D.setGL(Live2DGLWrapper(SCR_WIDTH, SCR_HEIGHT))
 
 with open(modelDef.model, 'rb') as f:
     live2DModel = Live2DModelOpenGL.loadModel(f.read())

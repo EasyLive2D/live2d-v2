@@ -3,11 +3,14 @@
 from core import DEF
 from core.draw import IDrawData
 from core.graphics import ClippingManagerOpenGL
-from core.id.base_data_id import BaseDataID
-from core.id.draw_data_id import DrawDataID
-from core.type.array import Array, Float32Array, Int16Array
-from core.util import UtSystem
+from core.id import BaseDataID
+from core.id import DrawDataID
+from core.type import Array, Float32Array, Int16Array
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from core.draw import MeshContext
+    from core.model import PartsDataContext
 
 class ModelContext:
     __verbose = True
@@ -17,7 +20,7 @@ class ModelContext:
     PARAM_UPDATED = True
     PARAM_FLOAT_MIN = (-1000000)
     PARAM_FLOAT_MAX = 1000000
-    DEFAULT_ARRAY_LENGTH = 32
+    DEFAULT_ARRAY_LENGTH = 0
 
     def __init__(self, model):
         self.needSetup = True
@@ -41,7 +44,7 @@ class ModelContext:
         self.orderList_lastDrawIndex = None
         self.nextList_drawIndex = None
         self.tmpPivotTableIndices = Int16Array(DEF.PIVOT_TABLE_SIZE)
-        self.tempTArray = Float32Array(DEF.MAX_INTERPOLATION * 2)
+        self.tempTArray = Float32Array(DEF.MAX_INTERPOLATION)
         self.model = model
         self.clipManager = None
         self.dpGL = None
@@ -90,21 +93,21 @@ class ModelContext:
             self.release()
 
         aO = self.model.getModelImpl()
-        partsDataList = aO.getPartsDataList()
-        aS = len(partsDataList)
+        parts_data_list = aO.getPartsDataList()
+        aS = len(parts_data_list)
         aH = Array()
         a3 = Array()
         for aV in range(0, aS, 1):
-            a4 = partsDataList[aV]
+            a4 = parts_data_list[aV]
             self.partsDataList.append(a4)
             self.partsContextList.append(a4.init())
-            baseDataList = a4.getDeformer()
-            aR = len(baseDataList)
+            base_data_list = a4.getDeformer()
+            aR = len(base_data_list)
             for aU in range(0, aR, 1):
-                aH.append(baseDataList[aU])
+                aH.append(base_data_list[aU])
 
             for aU in range(0, aR, 1):
-                aM = baseDataList[aU].init(self)
+                aM = base_data_list[aU].init(self)
                 aM.setPartsIndex(aV)
                 a3.append(aM)
 
@@ -138,7 +141,7 @@ class ModelContext:
 
         aI = aO.E2_()
         if aI is not None:
-            aJ = aI._1s()
+            aJ = aI.getParamDefFloatList()
             if aJ is not None:
                 aW = len(aJ)
                 for aV in range(0, aW, 1):
@@ -267,33 +270,13 @@ class ModelContext:
 
         return -1
 
-    @staticmethod
-    def copyValues(src, length):
-        arr = Float32Array(length)
-
-        UtSystem.arraycopy(src, 0, arr, 0, len(src))
-        return arr
-
     def extendAndAddParam(self, param_id, default_val, max_val, min_val):
-        if self.nextParamPos >= len(self.paramIdList):
-            length = len(self.paramIdList)
-            arr = Array(length * 2)
-            UtSystem.arraycopy(self.paramIdList, 0, arr, 0, length)
-            self.paramIdList = arr
-            self.paramValues = self.copyValues(self.paramValues, length * 2)
-            self.lastParamValues = self.copyValues(self.lastParamValues, length * 2)
-            self.paramMinValues = self.copyValues(self.paramMinValues, length * 2)
-            self.paramMaxValues = self.copyValues(self.paramMaxValues, length * 2)
-            arr = Array(len(arr))
-            UtSystem.arraycopy(self.updatedParamFlags, 0, arr, 0, length)
-            self.updatedParamFlags = arr
-
-        self.paramIdList[self.nextParamPos] = param_id
-        self.paramValues[self.nextParamPos] = default_val
-        self.lastParamValues[self.nextParamPos] = default_val
-        self.paramMinValues[self.nextParamPos] = max_val
-        self.paramMaxValues[self.nextParamPos] = min_val
-        self.updatedParamFlags[self.nextParamPos] = ModelContext.PARAM_UPDATED
+        self.paramIdList.append(param_id)
+        self.paramValues.append(default_val)
+        self.lastParamValues.append(default_val)
+        self.paramMinValues.append(max_val)
+        self.paramMaxValues.append(min_val)
+        self.updatedParamFlags.append(ModelContext.DEFAULT_PARAM_UPDATE_FLAG)
         ret = self.nextParamPos
         self.nextParamPos += 1
         return ret
@@ -311,18 +294,20 @@ class ModelContext:
         self.paramValues[aH] = aI
 
     def loadParam(self):
-        aH = len(self.paramValues)
-        if aH > len(self.savedParamValues):
-            aH = len(self.savedParamValues)
-
-        UtSystem.arraycopy(self.savedParamValues, 0, self.paramValues, 0, aH)
+        # aH = len(self.paramValues)
+        # if aH > len(self.savedParamValues):
+        #     aH = len(self.savedParamValues)
+        #
+        # UtSystem.arraycopy(self.savedParamValues, 0, self.paramValues, 0, aH)
+        self.paramValues = self.savedParamValues.copy()
 
     def saveParam(self):
-        aH = len(self.paramValues)
-        if aH > len(self.savedParamValues):
-            self.savedParamValues = Float32Array(aH)
-
-        UtSystem.arraycopy(self.paramValues, 0, self.savedParamValues, 0, aH)
+        # aH = len(self.paramValues)
+        # if aH > len(self.savedParamValues):
+        #     self.savedParamValues = Float32Array(aH)
+        #
+        # UtSystem.arraycopy(self.paramValues, 0, self.savedParamValues, 0, aH)
+        self.savedParamValues = self.paramValues.copy()
 
     def getInitVersion(self):
         return self.initVersion
@@ -369,10 +354,10 @@ class ModelContext:
     def getDeformerContext(self, aH):
         return self.deformerContextList[aH]
 
-    def getDrawContext(self, aH):
+    def getDrawContext(self, aH) -> 'MeshContext':
         return self.drawContextList[aH]
 
-    def getPartsContext(self, aH):
+    def getPartsContext(self, aH) -> 'PartsDataContext':
         return self.partsContextList[aH]
 
     def setDrawParam(self, aH):

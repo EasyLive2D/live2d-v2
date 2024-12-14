@@ -5,10 +5,10 @@ from .ut_system import UtSystem
 class UtInterpolate:
     @staticmethod
     def interpolateInt(bb, bo, bp, a2):
-        a1 = bo.Q2_(bb, bp)
+        a1 = bo.calcPivotValues(bb, bp)
         a3 = bb.getTempPivotTableIndices()
         ba = bb.getTempT()
-        bo.zr_(a3, ba, a1)
+        bo.calcPivotIndices(a3, ba, a1)
         if a1 <= 0:
             return a2[a3[0]]
 
@@ -107,10 +107,10 @@ class UtInterpolate:
 
     @staticmethod
     def interpolateFloat(ba, bo, bp, bg):
-        a1 = bo.Q2_(ba, bp)
+        a1 = bo.calcPivotValues(ba, bp)
         a2 = ba.getTempPivotTableIndices()
         a9 = ba.getTempT()
-        bo.zr_(a2, a9, a1)
+        bo.calcPivotIndices(a2, a9, a1)
         if a1 <= 0:
             return bg[a2[0]]
         if a1 == 1:
@@ -195,10 +195,10 @@ class UtInterpolate:
 
     @staticmethod
     def interpolatePoints(mdc, pivotMgr, retParamOut, numPts, pivotPoints, dstPoints, ptOffset, ptStep):
-        aN = pivotMgr.Q2_(mdc, retParamOut)
+        aN = pivotMgr.calcPivotValues(mdc, retParamOut)
         bw = mdc.getTempPivotTableIndices()
         a2 = mdc.getTempT()
-        pivotMgr.zr_(bw, a2, aN)
+        pivotMgr.calcPivotIndices(bw, a2, aN)
         aJ = numPts * 2
         aQ = ptOffset
         if aN <= 0:

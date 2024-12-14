@@ -1,18 +1,19 @@
 ﻿import json
+from typing import Any
 
+import OpenGL.GL as gl
 from PIL import Image
 
 from core.live2d_model_opengl import Live2DModelOpenGL
-import OpenGL.GL as gl
 
 
 class PlatformManager:
 
-    def loadBytes(self, path):
+    def loadBytes(self, path) -> bytes:
         with open(path, 'rb') as f:
             return f.read()
 
-    def loadLive2DModel(self, path):
+    def loadLive2DModel(self, path) -> Live2DModelOpenGL:
         with open(path, 'rb') as f:
             return Live2DModelOpenGL.loadModel(f.read())
 
@@ -34,5 +35,5 @@ class PlatformManager:
         gl.glBindTexture(gl.GL_TEXTURE_2D, 0)
         live2DModel.setTexture(no, texture)
 
-    def jsonParseFromBytes(self, path):
+    def jsonParseFromBytes(self, path) -> dict[str, Any]:
         return json.loads(path)

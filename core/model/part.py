@@ -1,6 +1,11 @@
-﻿from core.io.iserializable import ISerializable
-from core.model.parts_context import PartsDataContext
-from core.type.array import Array
+﻿from typing import TYPE_CHECKING
+
+from core.io.iserializable import ISerializable
+from core.type import Array
+from .parts_context import PartsDataContext
+
+if TYPE_CHECKING:
+    from core.draw import Mesh
 
 
 class PartsData(ISerializable):
@@ -10,7 +15,7 @@ class PartsData(ISerializable):
         self.locked = False
         self.id = None
         self.deformerList = None
-        self.drawDataList = None
+        self.drawDataList: list[Mesh] | None = None
 
     def initDirect(self):
         self.deformerList = Array()
@@ -57,5 +62,3 @@ class PartsData(ISerializable):
 
     def setId(self, aH):
         self.id = aH
-
-

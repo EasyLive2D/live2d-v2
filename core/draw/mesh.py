@@ -35,10 +35,10 @@ class Mesh(IDrawData):
     def getTextureNo(self):
         return self.textureNo
 
-    def ZL_(self):
+    def getUvs(self):
         return self.uvs
 
-    def H2_(self):
+    def getOptionFlag(self):
         return self.optionFlag
 
     def getNumPoints(self):
@@ -49,7 +49,7 @@ class Mesh(IDrawData):
 
     def initDirect(self):
         self.pivotMgr = PivotManager()
-        self.pivotMgr.zP_()
+        self.pivotMgr.initDirect()
 
     def read(self, br):
         super().read(br)
@@ -120,7 +120,7 @@ class Mesh(IDrawData):
         if not (self == aK.getDrawData()):
             print("### assert!! ### ")
 
-        if not self.pivotMgr.Ur_(aJ):
+        if not self.pivotMgr.checkParamUpdated(aJ):
             return
 
         super().setupInterpolate(aJ, aK)

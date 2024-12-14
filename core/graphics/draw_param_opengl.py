@@ -1,5 +1,6 @@
 ﻿from core.draw import Mesh
 from core.live2d import Live2D
+from core.live2d_gl_wrapper import Live2DGLWrapper
 from .draw_param import DrawParam
 
 
@@ -13,13 +14,13 @@ class FrameBufferObject:
 
 class DrawParamOpenGL(DrawParam):
 
-    def __init__(self, nr):
+    def __init__(self):
         super().__init__()
+        self.framebufferObject: FrameBufferObject | None = None
         self.shaderProgramOff = None
         self.textures = []
         self.transform = None
-        self.gl = None
-        self.glnr = nr
+        self.gl = Live2DGLWrapper()
         self.firstDraw = True
         self.anisotropyExt = None
         self.maxAnisotropy = 0
@@ -31,11 +32,16 @@ class DrawParamOpenGL(DrawParam):
         self.vertShaderOff = None
         self.fragShaderOff = None
 
+
+
     def getGL(self):
         return self.gl
 
     def setGL(self, aH):
         self.gl = aH
+
+    def resize(self, ww, wh):
+        self.gl.resize(ww, wh)
 
     def setTransform(self, aH):
         self.transform = aH
@@ -46,8 +52,8 @@ class DrawParamOpenGL(DrawParam):
             self.initShader()
             self.firstDraw = False
             # self.anisotropyExt = aH.MAX_TEXTURE_MAX_ANISOTROPY
-            if self.anisotropyExt:
-                self.maxAnisotropy = a_h.getParameter(self.anisotropyExt)
+            # if self.anisotropyExt:
+            #     self.maxAnisotropy = a_h.getParameter(self.anisotropyExt)
 
         a_h.disable(a_h.SCISSOR_TEST)
         a_h.disable(a_h.STENCIL_TEST)
@@ -63,8 +69,6 @@ class DrawParamOpenGL(DrawParam):
             return
 
         g0 = self.gl
-        if self.gl is None:
-            raise RuntimeError("gl is null")
 
         a_p = 1
         a3 = 1
@@ -112,7 +116,7 @@ class DrawParamOpenGL(DrawParam):
                                     self.getClipBufPre_clipContextDraw().matrixForDraw)
                 g0.uniformMatrix4fv(self.u_matrix_Loc_Off, False, self.matrix4x4)
                 g0.activeTexture(g0.TEXTURE2)
-                g0.bindTexture(g0.TEXTURE_2D, Live2D.frameTexture[self.glnr])
+                g0.bindTexture(g0.TEXTURE_2D, self.framebufferObject.texture)
                 g0.uniform1i(self.s_texture1_Loc_Off, 2)
                 aY = self.getClipBufPre_clipContextDraw().layoutChannelNo
                 a4 = self.getChannelFlagAsColor(aY)
@@ -167,8 +171,8 @@ class DrawParamOpenGL(DrawParam):
 
         g0.blendEquationSeparate(g0.FUNC_ADD, g0.FUNC_ADD)
         g0.blendFuncSeparate(a6, a_x, a_r, aK)
-        if self.anisotropyExt:
-            g0.texParameteri(g0.TEXTURE_2D, self.anisotropyExt.TEXTURE_MAX_ANISOTROPY_EXT, self.maxAnisotropy)
+        # if self.anisotropyExt:
+        #     g0.texParameteri(g0.TEXTURE_2D, self.anisotropyExt.TEXTURE_MAX_ANISOTROPY_EXT, self.maxAnisotropy)
 
         aJ = len(indexArray)
         g0.drawElements(g0.TRIANGLES, aJ, g0.UNSIGNED_SHORT, None)
@@ -379,11 +383,10 @@ class DrawParamOpenGL(DrawParam):
         aL.bindTexture(aL.TEXTURE_2D, 0)
         aL.bindRenderbuffer(aL.RENDERBUFFER, 0)
         aL.bindFramebuffer(aL.FRAMEBUFFER, 0)
-        Live2D.frameTexture[self.glnr] = aI
-        return FrameBufferObject(
+        self.framebufferObject = FrameBufferObject(
             fbo=aJ,
             rbo=aH,
-            tex=Live2D.frameTexture[self.glnr]
+            tex=aI
         )
 
 

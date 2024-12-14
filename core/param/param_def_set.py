@@ -4,16 +4,13 @@
 class ParamDefSet:
 
     def __init__(self):
-        self._4S = None
+        self.paramDefList = None
 
-    def _1s(self):
-        return self._4S
+    def getParamDefFloatList(self):
+        return self.paramDefList
 
-    def zP_(self):
-        self._4S = Array()
+    def initDirect(self):
+        self.paramDefList = Array()
 
-    def read(self, aH):
-        self._4S = aH.readObject()
-
-    def Ks_(self, aH):
-        self._4S.append(aH)
+    def read(self, br):
+        self.paramDefList = br.readObject()

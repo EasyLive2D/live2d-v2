@@ -1,9 +1,12 @@
-﻿class IPhysicsParam:
+﻿from abc import ABC, abstractmethod
+
+class IPhysicsParam(ABC):
 
     def __init__(self, aJ, aI, aH):
-        self.wL_ = aJ
+        self.paramId = aJ
         self.scale = aI
-        self.V0_ = aH
+        self.weight = aH
 
-    def oP_(self, aI, aH):
+    @abstractmethod
+    def update(self, aI, aH):
         pass

@@ -34,9 +34,9 @@ Since the core code is translated from the obfuscated `live2d.min.js`, the code 
 ```
 ## Usage
 
-A simple example: [simple.py](./sample/simple.py)
+A simple example: [simple.py](main/simple.py)
 
-A more comprehensive example: [app.py](./sample/app.py)
+A more comprehensive example: [app.py](main/app.py)
 
 ## Special Thanks
 

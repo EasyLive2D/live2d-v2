@@ -1,7 +1,7 @@
 ﻿from core.deformer import RotationDeformer, AffineEnt, WarpDeformer
 from core.draw import Mesh
 from core.model import ModelImpl, Avatar, PartsData
-from core.param import PivotManager, ParamPivots, ParamDefF, ParamDefSet
+from core.param import PivotManager, ParamPivots, ParamDefFloat, ParamDefSet
 
 
 class Live2DObjectFactory:
@@ -23,7 +23,7 @@ class Live2DObjectFactory:
                 return Mesh()
         elif clsNo < 150:
             if clsNo == 131:
-                return ParamDefF()
+                return ParamDefFloat()
             elif clsNo == 133:
                 return PartsData()
             elif clsNo == 136:

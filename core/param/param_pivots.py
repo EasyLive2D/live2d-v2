@@ -1,54 +1,54 @@
 ﻿class ParamPivots:
-    ds_ = -2
+    PARAM_INDEX_NOT_INIT = -2
 
     def __init__(self):
-        self.VP_ = 0
-        self.wL_ = None
-        self.GP_ = None
-        self._8o = ParamPivots.ds_
-        self._2r = -1
-        self.O2_ = 0
-        self.ri_ = 0
+        self.pivotCount = 0
+        self.paramId = None
+        self.pivotValues = None
+        self.paramIndex = ParamPivots.PARAM_INDEX_NOT_INIT
+        self.initVersion = -1
+        self.tmpPivotIndex = 0
+        self.tmpT = 0
 
     def read(self, aH):
-        self.wL_ = aH.readObject()
-        self.VP_ = aH.readInt32()
-        self.GP_ = aH.readObject()
+        self.paramId = aH.readObject()
+        self.pivotCount = aH.readInt32()
+        self.pivotValues = aH.readObject()
 
-    def getParamIndex(self, aH):
-        if self._2r != aH:
-            self._8o = ParamPivots.ds_
+    def getParamIndex(self, initVersion):
+        if self.initVersion != initVersion:
+            self.paramIndex = ParamPivots.PARAM_INDEX_NOT_INIT
 
-        return self._8o
+        return self.paramIndex
 
     def Pb_(self, aI, aH):
-        self._8o = aI
-        self._2r = aH
+        self.paramIndex = aI
+        self.initVersion = aH
 
     def getParamID(self):
-        return self.wL_
+        return self.paramId
 
-    def yP_(self, aH):
-        self.wL_ = aH
+    def setParamId(self, aH):
+        self.paramId = aH
 
-    def N2_(self):
-        return self.VP_
+    def getPivotCount(self):
+        return self.pivotCount
 
-    def d2_(self):
-        return self.GP_
+    def getPivotValues(self):
+        return self.pivotValues
 
-    def t2_(self, aI, aH):
-        self.VP_ = aI
-        self.GP_ = aH
+    def setPivotValues(self, count, values):
+        self.pivotCount = count
+        self.pivotValues = values
 
-    def Lr_(self):
-        return self.O2_
+    def getTmpPivotIndex(self):
+        return self.tmpPivotIndex
 
-    def wr_(self, aH):
-        self.O2_ = aH
+    def setTmpPivotIndex(self, index):
+        self.tmpPivotIndex = index
 
-    def SL_(self):
-        return self.ri_
+    def getTmpT(self):
+        return self.tmpT
 
-    def AL_(self, aH):
-        self.ri_ = aH
+    def setTmpT(self, value):
+        self.tmpT = value

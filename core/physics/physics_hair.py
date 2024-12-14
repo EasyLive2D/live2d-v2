@@ -2,18 +2,19 @@
 
 from core.type import Array
 from core.util import UtMath
+from .physics_constants import *
 from .physics_point import PhysicsPoint
 from .physics_src import PhysicsSrc
 from .physics_target import PhysicsTarget
-from . import physics_constants
+
 
 class PhysicsHair:
-    SRC_TO_X = physics_constants.SRC_TO_X
-    SRC_TO_Y = physics_constants.SRC_TO_Y
-    SRC_TO_G_ANGLE = physics_constants.SRC_TO_G_ANGLE
+    SRC_TO_X = SRC_TO_X
+    SRC_TO_Y = SRC_TO_Y
+    SRC_TO_G_ANGLE = SRC_TO_G_ANGLE
 
-    TARGET_FROM_ANGLE = physics_constants.TARGET_FROM_ANGLE
-    TARGET_FROM_ANGLE_V = physics_constants.TARGET_FROM_ANGLE_V
+    TARGET_FROM_ANGLE = TARGET_FROM_ANGLE
+    TARGET_FROM_ANGLE_V = TARGET_FROM_ANGLE_V
 
     def __init__(self):
         self.p1 = PhysicsPoint()
@@ -32,12 +33,12 @@ class PhysicsHair:
 
     def setup(self, aJ=None, aI=None, aH=None):
         self.ks_ = self.Yb_()
-        self.p2.xT_()
+        self.p2.setupLast()
         if aH is not None:
             self.Fo_ = aJ
             self.L2_ = aI
-            self.p1.p_ = aH
-            self.p2.p_ = aH
+            self.p1.mass = aH
+            self.p2.mass = aH
             self.p2.y = aJ
             self.setup()
 
@@ -81,7 +82,7 @@ class PhysicsHair:
         if aK != 0:
             for aJ in range(len(self.lL_) - 1, 0 - 1, -1):
                 aM = self.lL_[aJ]
-                aM.oP_(aI, self)
+                aM.update(aI, self)
 
             self.oo_(aI, aK)
             self.M2_ = self.Yb_()
@@ -90,7 +91,7 @@ class PhysicsHair:
 
         for aJ in range(len(self.qP_) - 1, 0 - 1, -1):
             aH = self.qP_[aJ]
-            aH.YS_(aI, self)
+            aH.update(aI, self)
 
         self.iT_ = aL
 
@@ -99,17 +100,17 @@ class PhysicsHair:
             aI = 0.033
 
         aU = 1 / aI
-        self.p1.vx = (self.p1.x - self.p1.s0_) * aU
-        self.p1.vy = (self.p1.y - self.p1._70) * aU
-        self.p1.ax = (self.p1.vx - self.p1._7L) * aU
-        self.p1.ay = (self.p1.vy - self.p1.HL_) * aU
-        self.p1.fx = self.p1.ax * self.p1.p_
-        self.p1.fy = self.p1.ay * self.p1.p_
-        self.p1.xT_()
+        self.p1.vx = (self.p1.x - self.p1.lastX) * aU
+        self.p1.vy = (self.p1.y - self.p1.lastY) * aU
+        self.p1.ax = (self.p1.vx - self.p1.lastVX) * aU
+        self.p1.ay = (self.p1.vy - self.p1.lastVY) * aU
+        self.p1.fx = self.p1.ax * self.p1.mass
+        self.p1.fy = self.p1.ay * self.p1.mass
+        self.p1.setupLast()
         aM = -(math.atan2((self.p1.y - self.p2.y), self.p1.x - self.p2.x))
         aR = math.cos(aM)
         aH = math.sin(aM)
-        aW = 9.8 * self.p2.p_
+        aW = 9.8 * self.p2.mass
         aQ = (self.Db_ * UtMath.DEG_TO_RAD)
         aP = (aW * math.cos(aM - aQ))
         aL = (aP * aH)
@@ -120,8 +121,8 @@ class PhysicsHair:
         aS = (-self.p2.vy * self.L2_)
         self.p2.fx = (aL + aK + aJ)
         self.p2.fy = (aV + aT + aS)
-        self.p2.ax = self.p2.fx / self.p2.p_
-        self.p2.ay = self.p2.fy / self.p2.p_
+        self.p2.ax = self.p2.fx / self.p2.mass
+        self.p2.ay = self.p2.fy / self.p2.mass
         self.p2.vx += self.p2.ax * aI
         self.p2.vy += self.p2.ay * aI
         self.p2.x += self.p2.vx * aI
@@ -130,6 +131,6 @@ class PhysicsHair:
             (self.p1.x - self.p2.x) * (self.p1.x - self.p2.x) + (self.p1.y - self.p2.y) * (self.p1.y - self.p2.y)))
         self.p2.x = self.p1.x + self.Fo_ * (self.p2.x - self.p1.x) / aO
         self.p2.y = self.p1.y + self.Fo_ * (self.p2.y - self.p1.y) / aO
-        self.p2.vx = (self.p2.x - self.p2.s0_) * aU
-        self.p2.vy = (self.p2.y - self.p2._70) * aU
-        self.p2.xT_()
+        self.p2.vx = (self.p2.x - self.p2.lastX) * aU
+        self.p2.vy = (self.p2.y - self.p2.lastY) * aU
+        self.p2.setupLast()

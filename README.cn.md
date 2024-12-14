@@ -35,9 +35,9 @@ pillow # 加载纹理
 
 ## 使用方法
 
-简单示例：[simple.py](./sample/simple.py)
+简单示例：[simple.py](main/simple.py)
 
-更复杂的示例：[app.py](./sample/app.py)
+更复杂的示例：[app.py](main/app.py)
 
 ## 特别感谢
 

@@ -1,25 +1,25 @@
-﻿class ParamDefF:
+﻿class ParamDefFloat:
 
     def __init__(self):
-        self.TT_ = None
-        self.LT_ = None
-        self.FS_ = None
-        self.wL_ = None
+        self.minValue = None
+        self.maxValue = None
+        self.defaultValue = None
+        self.paramId = None
 
-    def read(self, aH):
-        self.TT_ = aH.readFloat32()
-        self.LT_ = aH.readFloat32()
-        self.FS_ = aH.readFloat32()
-        self.wL_ = aH.readObject()
+    def read(self, br):
+        self.minValue = br.readFloat32()
+        self.maxValue = br.readFloat32()
+        self.defaultValue = br.readFloat32()
+        self.paramId = br.readObject()
 
-    def getMinValue(self):
-        return self.TT_
+    def getMinValue(self) -> float:
+        return self.minValue
 
-    def getMaxValue(self):
-        return self.LT_
+    def getMaxValue(self) -> float:
+        return self.maxValue
 
-    def getDefaultValue(self):
-        return self.FS_
+    def getDefaultValue(self) -> float:
+        return self.defaultValue
 
     def getParamID(self):
-        return self.wL_
+        return self.paramId

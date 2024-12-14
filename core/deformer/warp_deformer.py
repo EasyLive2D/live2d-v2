@@ -18,7 +18,7 @@ class WarpDeformer(Deformer):
 
     def initDirect(self):
         self.pivotMgr = PivotManager()
-        self.pivotMgr.zP_()
+        self.pivotMgr.initDirect()
 
     def read(self, br):
         super().read(br)
@@ -47,7 +47,7 @@ class WarpDeformer(Deformer):
 
     def setupInterpolate(self, modelContext, deformerContext: 'WarpContext'):
         aK = deformerContext
-        if not self.pivotMgr.Ur_(modelContext):
+        if not self.pivotMgr.checkParamUpdated(modelContext):
             return
 
         aL = self.VT_()

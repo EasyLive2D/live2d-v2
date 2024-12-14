@@ -1,23 +1,18 @@
 ﻿from abc import ABC, abstractmethod
 
-from core import DEF
+import core.DEF as DEF
 from core.draw import MeshContext, IDrawData, Mesh
 from core.id import ParamID, PartsDataID, DrawDataID
-from core.io.binary_reader import BinaryReader
+from core.io import BinaryReader
 from core.model import ModelImpl
-from core.model_context import ModelContext
+from .model_context import ModelContext
 
 
 class ALive2DModel(ABC):
-    _0s = 1
-    _4s = 2
-    _42 = 0
 
     def __init__(self):
         self.modelImpl = None
         self.modelContext = None
-        self.NP_ = 0
-        ALive2DModel._42 += 1
         self.modelContext = ModelContext(self)
 
     def setModelImpl(self, aH):
@@ -42,28 +37,32 @@ class ALive2DModel(ABC):
 
         return self.modelImpl.getCanvasHeight()
 
-    def getParamFloat(self, aH):
-        aH = self.modelContext.getParamIndex(ParamID.getID(aH))
+    def getParamFloat(self, x):
+        if not isinstance(x, int):
+            x = self.modelContext.getParamIndex(ParamID.getID(x))
 
-        return self.modelContext.getParamFloat(aH)
+        return self.modelContext.getParamFloat(x)
 
-    def setParamFloat(self, aH, aJ, aI=1):
-        aH = self.modelContext.getParamIndex(ParamID.getID(aH))
-        aJ = 0 if aJ is None else aJ
-        self.modelContext.setParamFloat(aH, self.modelContext.getParamFloat(aH) * (1 - aI) + aJ * aI)
+    def setParamFloat(self, x: int | str, value: float, weight: float = 1):
+        if not isinstance(x, int):
+            x = self.modelContext.getParamIndex(ParamID.getID(x))
+        value = 0 if value is None else value
+        self.modelContext.setParamFloat(x, self.modelContext.getParamFloat(x) * (1 - weight) + value * weight)
 
-    def addToParamFloat(self, aH, aJ, aI=1):
-        aH = self.modelContext.getParamIndex(ParamID.getID(aH))
+    def addToParamFloat(self, x: str | int, value: float, weight: float = 1):
+        if not isinstance(x, int):
+            x = self.modelContext.getParamIndex(ParamID.getID(x))
 
-        self.modelContext.setParamFloat(aH, self.modelContext.getParamFloat(aH) + aJ * aI)
+        self.modelContext.setParamFloat(x, self.modelContext.getParamFloat(x) + value * weight)
 
-    def multParamFloat(self, aH, aJ, aI=1):
-        aH = self.modelContext.getParamIndex(ParamID.getID(aH))
+    def multParamFloat(self, x: int | str, value: float, weight: float = 1):
+        if not isinstance(x, int):
+            x = self.modelContext.getParamIndex(ParamID.getID(x))
 
-        self.modelContext.setParamFloat(aH, self.modelContext.getParamFloat(aH) * (1 + (aJ - 1) * aI))
+        self.modelContext.setParamFloat(x, self.modelContext.getParamFloat(x) * (1 + (value - 1) * weight))
 
-    def getParamIndex(self, aH):
-        return self.modelContext.getParamIndex(ParamID.getID(aH))
+    def getParamIndex(self, idStr: str) -> int:
+        return self.modelContext.getParamIndex(ParamID.getID(idStr))
 
     def loadParam(self):
         self.modelContext.loadParam()
@@ -140,30 +139,28 @@ class ALive2DModel(ABC):
             raise RuntimeError("param error")
 
         br = BinaryReader(buf)
-        aM = br.readByte()
-        aK = br.readByte()
-        aJ = br.readByte()
-        if aM == 109 and aK == 111 and aJ == 99:
+        magic1 = br.readByte()
+        magic2 = br.readByte()
+        magic3 = br.readByte()
+        # magic = 'moc'
+        if magic1 == 109 and magic2 == 111 and magic3 == 99:
             version = br.readByte()
         else:
             raise RuntimeError("Invalid MOC file.")
 
         br.setFormatVersion(version)
         if version > DEF.LIVE2D_FORMAT_VERSION_AVAILABLE:
-            model.NP_ |= ALive2DModel._4s
-            aR = DEF.LIVE2D_FORMAT_VERSION_AVAILABLE
-            aI = "Unsupported version %d\n" % version
-            raise RuntimeError(aI)
+            es = "Unsupported version %d\n" % version
+            raise RuntimeError(es)
 
         aL = br.readObject()
         if version >= DEF.LIVE2D_FORMAT_VERSION_V2_8_TEX_OPTION:
             aH = br.readUShort()
             aT = br.readUShort()
             if aH != -30584 or aT != -30584:
-                model.NP_ |= ALive2DModel._0s
-                raise RuntimeError("_gi _C li_ , _0 _6 Ui_.")
+                raise RuntimeError("Invalid load EOF")
 
         model.setModelImpl(aL)
-        modelContext = model.getModelContext()
-        modelContext.setDrawParam(model.getDrawParam())
-        modelContext.init()
+        model_context = model.getModelContext()
+        model_context.setDrawParam(model.getDrawParam())
+        model_context.init()

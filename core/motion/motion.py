@@ -1,14 +1,14 @@
 ﻿class Motion:
-    Fr_ = 0
-    hs_ = 1
-    ws_ = 100
-    Ns_ = 101
-    xs_ = 102
-    us_ = 103
-    qs_ = 104
-    Ys_ = 105
+    MOTION_TYPE_PARAM = 0
+    MOTION_TYPE_PARTS_VISIBLE = 1
+    MOTION_TYPE_LAYOUT_X = 100
+    MOTION_TYPE_LAYOUT_Y = 101
+    MOTION_TYPE_LAYOUT_ANCHOR_X = 102
+    MOTION_TYPE_LAYOUT_ANCHOR_Y = 103
+    MOTION_TYPE_LAYOUT_SCALE_X = 104
+    MOTION_TYPE_LAYOUT_SCALE_Y = 105
 
     def __init__(self):
-        self._4P = None
-        self.I0_ = None
-        self.RP_ = None
+        self.paramIdStr = None
+        self.values = None
+        self.mtnType = None

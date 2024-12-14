@@ -1,60 +1,46 @@
-﻿from core.motion.amotion import AMotion
-from core.motion.motion import Motion
-from core.type import Array
+﻿from core.type import Array
 from core.util import UtString
+from .amotion import AMotion
+from .motion import Motion
 
 
 class Live2DMotion(AMotion):
-    cs_ = "VISIBLE:"
-    ar_ = "LAYOUT:"
-    MTN_PREFIX_FADEIN = "FADEIN:"
-    MTN_PREFIX_FADEOUT = "FADEOUT:"
-    Co_ = 0
-    _1T = 1
+    MTN_PREFIX_VISIBLE = "VISIBLE:"
+    MTN_PREFIX_LAYOUT = "LAYOUT:"
+    MTN_PREFIX_FADE_IN = "FADEIN:"
+    MTN_PREFIX_FADE_OUT = "FADEOUT:"
 
     def __init__(self):
 
         super().__init__()
         self.motions = Array()
-        self.o2_ = None
-        self._7r = Live2DMotion.Co_
-        Live2DMotion.Co_ += 1
-        self.D0_ = 30
-        self.yT_ = 0
-        self._E = False
+        self.srcFps = 30
+        self.maxLength = 0
+        self.loop = False
         self.loopFadeIn = True
-        self.rr_ = -1
-        self.eP_ = 0
+        self.loopDurationMSec = -1
+        self.lastWeight = 0
 
     def getDurationMSec(self):
-        return -1 if self._E else self.rr_
+        return -1 if self.loop else self.loopDurationMSec
 
     def getLoopDurationMSec(self):
-        return self.rr_
-
-    def dump(self):
-        for aJ in range(0, len(self.motions), 1):
-            aH = self.motions[aJ]
-            print("_wL[%s] [%d]. ", aH._4P, len(aH.I0_))
-            for aI in range(0, 10, 1):
-                print("%5.2f ,", aH.I0_[aI])
-
-            print("\n")
+        return self.loopDurationMSec
 
     def updateParamExe(self, aJ, aN, aQ, a3):
-        aO = aN - a3.z2_
-        a0 = aO * self.D0_ / 1000
+        aO = aN - a3.startTimeMSec
+        a0 = aO * self.srcFps / 1000
         aK = int(a0)
         aR = a0 - aK
         for aZ in range(0, len(self.motions), 1):
             aV = self.motions[aZ]
-            aL = len(aV.I0_)
-            aT = aV._4P
-            if aV.RP_ == Motion.hs_:
-                aX = aV.I0_[(aL - 1 if aK >= aL else aK)]
+            aL = len(aV.values)
+            aT = aV.paramIdStr
+            if aV.mtnType == Motion.MOTION_TYPE_PARTS_VISIBLE:
+                aX = aV.values[(aL - 1 if aK >= aL else aK)]
                 aJ.setParamFloat(aT, aX)
             else:
-                if Motion.ws_ <= aV.RP_ <= Motion.Ys_:
+                if Motion.MOTION_TYPE_LAYOUT_X <= aV.mtnType <= Motion.MOTION_TYPE_LAYOUT_SCALE_Y:
                     pass
                 else:
                     aH = aJ.getParamIndex(aT)
@@ -64,8 +50,8 @@ class Live2DMotion(AMotion):
                     aM = 0.4
                     aS = aM * (aY - aW)
                     aU = a4.getParamFloat(aH)
-                    a2 = aV.I0_[(aL - 1 if aK >= aL else aK)]
-                    a1 = aV.I0_[(aL - 1 if aK + 1 >= aL else aK + 1)]
+                    a2 = aV.values[(aL - 1 if aK >= aL else aK)]
+                    a1 = aV.values[(aL - 1 if aK + 1 >= aL else aK + 1)]
                     if (a2 < a1 and a1 - a2 > aS) or (a2 > a1 and a2 - a1 > aS):
                         aI = a2
                     else:
@@ -74,40 +60,34 @@ class Live2DMotion(AMotion):
                     aP = aU + (aI - aU) * aQ
                     aJ.setParamFloat(aT, aP)
 
-        if aK >= self.yT_:
-            if self._E:
-                a3.z2_ = aN
+        if aK >= self.maxLength:
+            if self.loop:
+                a3.startTimeMSec = aN
                 if self.loopFadeIn:
-                    a3.bs_ = aN
+                    a3.fadeInStartTimeMSec = aN
             else:
-                a3._9L = True
+                a3.finished = True
 
-        self.eP_ = aQ
+        self.lastWeight = aQ
 
-    def r0_(self):
-        return self._E
+    def isLoop(self):
+        return self.loop
 
-    def aL_(self, aH):
-        self._E = aH
-
-    def S0_(self):
-        return self.D0_
-
-    def U0_(self, aH):
-        self.D0_ = aH
+    def setLoop(self, aH):
+        self.loop = aH
 
     def isLoopFadeIn(self):
         return self.loopFadeIn
 
-    def setLoopFadeIn(self, aH):
-        self.loopFadeIn = aH
+    def setLoopFadeIn(self, value):
+        self.loopFadeIn = value
 
     @staticmethod
     def loadMotion(aT: bytes):
-        aN = Live2DMotion()
+        mtn = Live2DMotion()
         aI = [0]
         aQ = len(aT)
-        aN.yT_ = 0
+        mtn.maxLength = 0
         aJ = 0
         while aJ < aQ:
             aL = aT[aJ]
@@ -156,7 +136,7 @@ class Live2DMotion(AMotion):
                         aM = UtString.strToFloat(aT, aQ, aJ, aI)
                         if aI[0] > 0:
                             if aP and 5 < aM < 121:
-                                aN.D0_ = aM
+                                mtn.srcFps = aM
 
                         aJ = aI[0]
                         aJ += 1
@@ -184,34 +164,34 @@ class Live2DMotion(AMotion):
 
                 if aK >= 0:
                     aO = Motion()
-                    if UtString.startswith(aT, aV, Live2DMotion.cs_):
-                        aO.RP_ = Motion.hs_
-                        aO._4P = UtString.createString(aT, aV, aK - aV)
+                    if UtString.startswith(aT, aV, Live2DMotion.MTN_PREFIX_VISIBLE):
+                        aO.mtnType = Motion.MOTION_TYPE_PARTS_VISIBLE
+                        aO.paramIdStr = UtString.createString(aT, aV, aK - aV)
                     else:
-                        if UtString.startswith(aT, aV, Live2DMotion.ar_):
-                            aO._4P = UtString.createString(aT, aV + 7, aK - aV - 7)
+                        if UtString.startswith(aT, aV, Live2DMotion.MTN_PREFIX_LAYOUT):
+                            aO.paramIdStr = UtString.createString(aT, aV + 7, aK - aV - 7)
                             if UtString.startswith(aT, aV + 7, "ANCHOR_X"):
-                                aO.RP_ = Motion.xs_
+                                aO.mtnType = Motion.MOTION_TYPE_LAYOUT_ANCHOR_X
                             else:
                                 if UtString.startswith(aT, aV + 7, "ANCHOR_Y"):
-                                    aO.RP_ = Motion.us_
+                                    aO.mtnType = Motion.MOTION_TYPE_LAYOUT_ANCHOR_Y
                                 else:
                                     if UtString.startswith(aT, aV + 7, "SCALE_X"):
-                                        aO.RP_ = Motion.qs_
+                                        aO.mtnType = Motion.MOTION_TYPE_LAYOUT_SCALE_X
                                     else:
                                         if UtString.startswith(aT, aV + 7, "SCALE_Y"):
-                                            aO.RP_ = Motion.Ys_
+                                            aO.mtnType = Motion.MOTION_TYPE_LAYOUT_SCALE_Y
                                         else:
                                             if UtString.startswith(aT, aV + 7, "AffineEnt"):
-                                                aO.RP_ = Motion.ws_
+                                                aO.mtnType = Motion.MOTION_TYPE_LAYOUT_X
                                             else:
                                                 if UtString.startswith(aT, aV + 7, "Y"):
-                                                    aO.RP_ = Motion.Ns_
+                                                    aO.mtnType = Motion.MOTION_TYPE_LAYOUT_Y
                         else:
-                            aO.RP_ = Motion.Fr_
-                            aO._4P = UtString.createString(aT, aV, aK - aV)
+                            aO.mtnType = Motion.MOTION_TYPE_PARAM
+                            aO.paramIdStr = UtString.createString(aT, aV, aK - aV)
 
-                    aN.motions.append(aO)
+                    mtn.motions.append(aO)
                     aU = 0
                     aR = []
                     aJ = aK + 1
@@ -230,17 +210,17 @@ class Live2DMotion(AMotion):
                             aU += 1
                             aH = aI[0]
                             if aH < aJ:
-                                print("_n0 hi_ . @Live2DMotion loadMotion()\n")
+                                print("invalid state during loadMotion\n")
                                 break
 
                             aJ = aH - 1
                         aJ += 1
 
-                    aO.I0_ = aR
-                    if aU > aN.yT_:
-                        aN.yT_ = aU
+                    aO.values = aR
+                    if aU > mtn.maxLength:
+                        mtn.maxLength = aU
 
             aJ += 1
 
-        aN.rr_ = int((1000 * aN.yT_) / aN.D0_)
-        return aN
+        mtn.loopDurationMSec = int((1000 * mtn.maxLength) / mtn.srcFps)
+        return mtn
