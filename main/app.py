@@ -1,6 +1,5 @@
 ﻿import pygame
 
-from LAppDefine import MotionPriority
 from core.live2d import Live2D
 from framework.Live2DFramework import Live2DFramework
 from lapp_model import LAppModel
