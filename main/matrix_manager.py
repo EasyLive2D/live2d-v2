@@ -1,50 +1,66 @@
 ﻿from framework.matrix.l2d_matrix44 import L2DMatrix44
-from framework.matrix.l2d_view_matrix import L2DViewMatrix
-from main import LAppDefine
 
 
 class MatrixManager:
 
     def __init__(self):
         self.__projection = L2DMatrix44()
-        self.__viewMatrix = L2DViewMatrix()
-        self.__viewMatrix.setMinScale(0.1)
         self.__screenToScene = L2DMatrix44()
-        self.__tmpMatrix = L2DViewMatrix()
+        self.__ww = 600
+        self.__wh = 600
+        self.__offsetX = 0
+        self.__offsetY = 0
+        self.__scale = 1
+
+    def getWidth(self):
+        return self.__ww
+
+    def getHeight(self):
+        return self.__wh
 
     def onResize(self, width: int, height: int):
-        ratio = width / height
-        left = LAppDefine.VIEW_LOGICAL_LEFT
-        right = LAppDefine.VIEW_LOGICAL_RIGHT
+        self.__ww = width
+        self.__wh = height
+
+        ratio = float(width) / float(height)
+        left = -1.0
+        right = 1.0
         bottom = -ratio
         top = ratio
-        self.__viewMatrix.setScreenRect(left, right, bottom, top)
-        self.__viewMatrix.setMaxScreenRect(
-            LAppDefine.VIEW_LOGICAL_MAX_LEFT,
-            LAppDefine.VIEW_LOGICAL_MAX_RIGHT,
-            LAppDefine.VIEW_LOGICAL_MAX_BOTTOM,
-            LAppDefine.VIEW_LOGICAL_MAX_TOP
-        )
-
-        self.__projection.identity()
-        self.__projection.multScale(1.0, width / height)
 
         self.__screenToScene.identity()
-        self.__screenToScene.multTranslate(-width / 2.0, -height / 2.0)
-        self.__screenToScene.multScale(2 / width, -2 / width)
+        self.__screenToScene.multTranslate(-width / 2, -height / 2)
+
+        if width > height:
+            sw = abs(right - left)
+            self.__screenToScene.multScale(sw / width, -sw / width)
+        else:
+            sh = abs(top - bottom)
+            self.__screenToScene.multScale(sh / height, -sh / height)
 
     def screenToScene(self, scr_x: float, scr_y: float) -> tuple[float, float]:
         return self.__screenToScene.transformX(scr_x), self.__screenToScene.transformY(scr_y)
 
-    def invertTransform(self, sx: float, sy: float):
-        return self.__viewMatrix.invertTransformX(sx), self.__viewMatrix.invertTransformY(sy)
+    def invertTransform(self, src_x, src_y) -> tuple[float, float]:
+        return self.__projection.invertTransformX(src_x), self.__projection.invertTransformY(src_y)
 
-    def setScale(self, cx, cy, scale: float):
-        self.__viewMatrix.adjustScale(cx, cy, scale)
+    def setScale(self, scale: float):
+        self.__scale = scale
 
-    def getMvp(self, modelMatrix) -> list:
-        self.__tmpMatrix.identity()
-        self.__tmpMatrix.mul(self.__tmpMatrix.getArray(), self.__projection.getArray(), self.__tmpMatrix.getArray())
-        self.__tmpMatrix.mul(self.__tmpMatrix.getArray(), self.__viewMatrix.getArray(), self.__tmpMatrix.getArray())
-        self.__tmpMatrix.mul(self.__tmpMatrix.getArray(), modelMatrix.getArray(), self.__tmpMatrix.getArray())
-        return self.__tmpMatrix.getArray()
+    def setOffset(self, dx: float, dy: float):
+        self.__offsetX = dx
+        self.__offsetY = dy
+
+    def getMvp(self, model_matrix) -> list:
+        self.__projection.identity()
+
+        if self.__ww > self.__wh:
+            self.__projection.multScale(1.0, self.__ww / self.__wh)
+        else:
+            self.__projection.multScale(self.__wh / self.__ww, 1.0)
+
+        self.__projection.multScale(self.__scale, self.__scale)
+        self.__projection.multTranslate(self.__offsetX, self.__offsetY)
+
+        self.__projection.mul(self.__projection.getArray(), model_matrix.getArray(), self.__projection.getArray())
+        return self.__projection.getArray()

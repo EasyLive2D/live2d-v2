@@ -6,14 +6,13 @@ from core.util import UtSystem, log
 from framework.model.l2d_base_model import L2DBaseModel
 from framework.motion.l2d_eye_blink import L2DEyeBlink
 from framework.motion.l2d_target_point import L2DTargetPoint
-from main.LAppDefine import MotionPriority
+from main.lapp_define import MotionPriority
 from main.matrix_manager import MatrixManager
-from model_setting_json import ModelSettingJson
-from params import Parameter
+from main.model_setting_json import ModelSettingJson
+from main.params import Parameter
 
 if TYPE_CHECKING:
     from core.draw import MeshContext, Mesh
-    from core.model import PartsData
 
 
 class LAppModel(L2DBaseModel):
@@ -118,18 +117,16 @@ class LAppModel(L2DBaseModel):
 
     def Drag(self, x: float, y: float):
         scx, scy = self.matrixManager.screenToScene(x, y)
-        vx, vy = self.matrixManager.invertTransform(scx, scy)
-        self.dragMgr.setPoint(vx, vy)
+        self.dragMgr.setPoint(scx, scy)
 
     def IsMotionFinished(self) -> bool:
         return self.mainMotionManager.isFinished()
 
     def SetOffset(self, dx: float, dy: float):
-        self.modelMatrix.setCenterPosition(dx, dy)
+        self.matrixManager.setOffset(dx, dy)
 
     def SetScale(self, scale: float):
-        self.modelMatrix.multScale(scale, scale)
-        self.modelMatrix.setCenterPosition(self.modelMatrix.ocx, self.modelMatrix.ocy)
+        self.matrixManager.setScale(scale)
 
     def SetParameterValue(self, paramId: str, value: float, weight: float):
         self.live2DModel.setParamFloat(paramId, value, weight)
@@ -137,7 +134,7 @@ class LAppModel(L2DBaseModel):
     def AddParameterValue(self, paramId: str, value: float, weight: float):
         self.live2DModel.addToParamFloat(paramId, value, weight)
 
-    def SetAutoBreath(self, enable: bool):
+    def SetAutoBreathEnable(self, enable: bool):
         self.autoBreath = enable
 
     def SetAutoBlinkEnable(self, enable: bool):
@@ -153,7 +150,7 @@ class LAppModel(L2DBaseModel):
         p.min = self.live2DModel.getModelContext().getParamMin(index)
         inner_params = self.live2DModel.getModelImpl().paramDefSet.getParamDefFloatList()
         is_inner = index < len(inner_params)
-        p.type = 'inner' if is_inner else 'outer'
+        p.type = Parameter.TYPE_INNER if is_inner else Parameter.TYPE_OUTER
         p.default = inner_params[index].defaultValue if is_inner else 0
         p.id = self.live2DModel.getModelContext().paramIdList[index]
         return p
@@ -211,8 +208,6 @@ class LAppModel(L2DBaseModel):
         if self.pose is not None:
             self.pose.updateParam(self.live2DModel)
 
-        self.live2DModel.update()
-
     def SetRandomExpression(self):
         tmp = []
         for name in self.expressions:
@@ -252,14 +247,13 @@ class LAppModel(L2DBaseModel):
             s_call(name, no)
         self.__setFadeInFadeOut(name, no, priority, mtn)
 
-    def SetExpression(self, name):
+    def SetExpression(self, name: str):
         motion = self.expressions[name]
-        # TODO log
-        # if LAppDefine.DEBUG_LOG:
-        #     print("Expression : " + name)
         self.expressionManager.startMotion(motion, False)
 
     def Draw(self):
+        # 根据设置的参数更新绘图所需参数
+        self.live2DModel.update()
         model_matrix = self.modelMatrix
         tmp_matrix = self.matrixManager.getMvp(model_matrix)
         self.live2DModel.setMatrix(tmp_matrix)
@@ -284,18 +278,14 @@ class LAppModel(L2DBaseModel):
             motion.setFadeOut(self.modelSetting.getMotionFadeOut(name, i))
 
     def __setFadeInFadeOut(self, name, no, priority, motion):
-        # motion_name = self.modelSetting.getMotionFile(name, no)
         motion.setFadeIn(self.modelSetting.getMotionFadeIn(name, no))
         motion.setFadeOut(self.modelSetting.getMotionFadeOut(name, no))
 
-        # if self.modelSetting.getMotionSound(name, no) is not None:
-        # sound_name = self.modelSetting.getMotionSound(name, no)
         self.mainMotionManager.startMotionPrio(motion, priority)
 
     def HitPart(self, src_x: float, src_y: float, topOnly: bool = False) -> list[str]:
-        scx, scy = self.matrixManager.screenToScene(src_x, src_y)
-        vx, vy = self.matrixManager.invertTransform(scx, scy)
-        mx, my = self.modelMatrix.invertTransformX(vx), self.modelMatrix.invertTransformY(vy)
+        src_x, src_y = self.matrixManager.screenToScene(src_x, src_y)
+        mx, my = self.matrixManager.invertTransform(src_x, src_y)
         mctx = self.live2DModel.getModelContext()
         draw_orders = mctx.nextList_drawIndex
         draw_orders = reversed(draw_orders)
@@ -303,11 +293,15 @@ class LAppModel(L2DBaseModel):
         for idx in draw_orders:
             if idx == -1:
                 continue
+
             ddcxt: 'MeshContext' = mctx.getDrawContext(idx)
-            parent_part: 'PartsData' = mctx.getPartsContext(ddcxt.partsIndex).partsData
-            if parent_part.id in hit_part_ids:
+            pctx = mctx.getPartsContext(ddcxt.partsIndex)
+            parent_part = pctx.partsData
+            if not parent_part.visible or pctx.partsOpacity < 0.1:
                 continue
-            if not parent_part.visible:
+
+            part_id = str(parent_part.id)
+            if part_id in hit_part_ids:
                 continue
 
             dd: 'Mesh' = ddcxt.drawData
@@ -318,35 +312,49 @@ class LAppModel(L2DBaseModel):
                 p1_idx = indices[i] * 2
                 p2_idx = indices[i + 1] * 2
                 p3_idx = indices[i + 2] * 2
-                if isInTriangle(mx, my,
-                                vertices[p1_idx], vertices[p1_idx + 1],
-                                vertices[p2_idx], vertices[p2_idx + 1],
-                                vertices[p3_idx], vertices[p3_idx + 1]):
-                    hit_part_ids.append(str(parent_part.id))
-                    if topOnly:
-                        return hit_part_ids
-                    break
+                if not self.__isInTriangle(mx, my,
+                                           vertices[p1_idx], vertices[p1_idx + 1],
+                                           vertices[p2_idx], vertices[p2_idx + 1],
+                                           vertices[p3_idx], vertices[p3_idx + 1]):
+                    continue
+
+                hit_part_ids.append(part_id)
+                if topOnly:
+                    return hit_part_ids
+                break
 
         return hit_part_ids
 
+    @staticmethod
+    def __isInTriangle(x, y, x0, y0, x1, y1, x2, y2) -> bool:
+        if x < min(x0, x1, x2):
+            return False
+        if x > max(x0, x1, x2):
+            return False
+        if y < min(y0, y1, y2):
+            return False
+        if y > max(y0, y1, y2):
+            return False
 
-def isInTriangle(x, y, x0, y0, x1, y1, x2, y2) -> bool:
-    if x < min(min(x0, x1), x2):
-        return False
-    if x > max(max(x0, x1), x2):
-        return False
-    if y < min(min(y0, y1), y2):
-        return False
-    if y < max(max(y0, y1), y2):
-        return False
+        d_x = x - x2
+        d_y = y - y2
+        d_x21 = x2 - x1
+        d_y12 = y1 - y2
+        D = d_y12 * (x0 - x2) + d_x21 * (y0 - y2)
+        s = d_y12 * d_x + d_x21 * d_y
+        t = (y2 - y0) * d_x + (x0 - x2) * d_y
+        if D < 0:
+            return s <= 0 and t <= 0 and s + t >= D
+        return s >= 0 and t >= 0 and s + t <= D
 
-    dX = x - x2
-    dY = y - y2
-    dX21 = x2 - x1
-    dY12 = y1 - y2
-    D = dY12 * (x0 - x2) + dX21 * (y0 - y2)
-    s = dY12 * dX + dX21 * dY
-    t = (y2 - y0) * dX + (x0 - x2) * dY
-    if D < 0:
-        return s <= 0 and t <= 0 and s + t >= D
-    return s >= 0 and t >= 0 and s + t <= D
+    def setPartScreenColor(self, part_index: int, r: float, g: float, b: float, a: float):
+        pass
+
+    def GetPartScreenColor(self, part_index: int) -> tuple[float, float, float, float]:
+        pass
+
+    def SetPartMultiplyColor(self, part_index: int, r: float, g: float, b: float, a: float):
+        pass
+
+    def GetPartMultiplyColor(self, part_index: int) -> tuple[float, float, float, float]:
+        pass

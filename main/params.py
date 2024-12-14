@@ -36,10 +36,11 @@ class StandardParams:
 
 
 class Parameter:
+    TYPE_INNER = 0  # params defined in moc file
+    TYPE_OUTER = 1  # params generated from motion file
 
     def __init__(self):
         self.id: str = ""
-        # [DEPRECATED] never used in models versioned cubism 2.1
         self.type: int = 0
         self.value: float = 0
         self.max: float = 0

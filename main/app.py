@@ -9,7 +9,7 @@ SCR_WIDTH = 300
 SCR_HEIGHT = 300
 
 pygame.init()
-pygame.display.set_mode((400, 400), pygame.DOUBLEBUF | pygame.OPENGL)
+pygame.display.set_mode((SCR_WIDTH, SCR_HEIGHT), pygame.DOUBLEBUF | pygame.OPENGL)
 
 Live2D.init()
 
@@ -25,9 +25,11 @@ scaling = 1
 dx = 0
 dy = 0
 
-model.SetAutoBreath(False)
+model.SetAutoBreathEnable(False)
+model.SetAutoBlinkEnable(False)
 
 last_part_id: str | None = None
+
 
 def onEvent(e):
     global scaling, dx, dy, last_part_id
@@ -35,16 +37,15 @@ def onEvent(e):
     if e.type == pygame.MOUSEMOTION:
         x, y = pygame.mouse.get_pos()
         model.Drag(x, y)
+    elif e.type == pygame.MOUSEBUTTONUP:
+        x, y = pygame.mouse.get_pos()
         ids = model.HitPart(x, y)
         print(ids)
         if len(ids) > 0:
             if last_part_id is not None:
                 model.SetPartOpacity(partIds.index(last_part_id), 1)
-            model.SetPartOpacity(partIds.index(ids[0]), 0.5)
             last_part_id = ids[0]
-
-    elif e.type == pygame.MOUSEBUTTONUP:
-        model.Touch(*pygame.mouse.get_pos())
+        # model.Touch(*pygame.mouse.get_pos())
         # model.StartRandomMotion(priority=MotionPriority.FORCE)
     elif e.type == pygame.KEYDOWN:
         if e.key == pygame.K_a:
@@ -67,7 +68,7 @@ def onEvent(e):
             model.SetScale(scaling)
 
 
-model.Resize(400, 400)
+model.Resize(SCR_WIDTH, SCR_HEIGHT)
 
 for i in range(model.GetParameterCount()):
     print(model.GetParameter(i))
@@ -91,6 +92,8 @@ while True:
     Live2D.clearBuffer()
 
     model.Update()
+    if last_part_id is not None:
+        model.SetPartOpacity(partIds.index(last_part_id), 0.5)
     model.Draw()
     pygame.display.flip()
 

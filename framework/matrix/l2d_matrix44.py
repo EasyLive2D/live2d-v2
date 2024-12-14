@@ -42,7 +42,10 @@ class L2DMatrix44:
         return (src - self.tr[13]) / self.tr[5]
 
     def multTranslate(self, shiftX, shiftY):
-        tr1 = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, shiftX, shiftY, 0, 1]
+        tr1 = [1, 0, 0, 0,
+               0, 1, 0, 0,
+               0, 0, 1, 0,
+               shiftX, shiftY, 0, 1]
         L2DMatrix44.mul(tr1, self.tr, self.tr)
 
     def translate(self, x, y):
