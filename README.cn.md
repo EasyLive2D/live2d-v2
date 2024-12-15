@@ -38,9 +38,9 @@ pillow # 加载纹理
 
 安装 `requirements.txt` 中的依赖，然后运行下面的任何一个文件即可：
 
-简单示例：[simple.py](main/simple.py)
+简单示例：[simple.py](./simple.py)
 
-更复杂的示例：[app.py](main/app.py)
+更复杂的示例：[app.py](./app.py)
 
 ## 特别感谢
 

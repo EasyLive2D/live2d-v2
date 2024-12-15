@@ -38,9 +38,9 @@ Since the core code is translated from the obfuscated `live2d.min.js`, the code 
 
 Install dependencies in `requirements.txt` and run either of the following:
 
-A simple example: [simple.py](main/simple.py)
+A simple example: [simple.py](./simple.py)
 
-A more comprehensive example: [app.py](main/app.py)
+A more comprehensive example: [./app.py](app.py)
 
 ## Special Thanks
 
