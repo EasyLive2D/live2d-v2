@@ -36,21 +36,21 @@ def loadImage(filePath):
     return texture
 
 
-# name = "kasumi"
-# modelDef = ModelDef(
-#     f"../test-data/{name}.moc",
-#     [f"../test-data/{name}.png"]
-# )
+name = "kasumi"
+modelDef = ModelDef(
+    f"./test-data/{name}.moc",
+    [f"./test-data/{name}.png"]
+)
 
 # rendering does not work properly for this model
-modelDef = ModelDef(
-    "./resources/haru/haru.moc",
-    [
-        "./resources/haru/haru.1024/texture_00.png",
-        "./resources/haru/haru.1024/texture_01.png",
-        "./resources/haru/haru.1024/texture_02.png",
-    ]
-)
+# modelDef = ModelDef(
+#     "./resources/haru/haru.moc",
+#     [
+#         "./resources/haru/haru.1024/texture_00.png",
+#         "./resources/haru/haru.1024/texture_01.png",
+#         "./resources/haru/haru.1024/texture_02.png",
+#     ]
+# )
 
 SCR_WIDTH = 600
 SCR_HEIGHT = 600
@@ -74,9 +74,7 @@ def processEvents(running):
     return running
 
 
-live2DModel.setAnisotropy(False)
-live2DModel.setPremultipliedAlpha(False)
-
+live2DModel.resize(SCR_WIDTH, SCR_HEIGHT)
 running = True
 while True:
     running = processEvents(running)
@@ -85,7 +83,7 @@ while True:
         break
 
     gl.glClearColor(0.0, 0.0, 0.0, 0.0)
-    gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
+    gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 
     s = 2.0 / live2DModel.getCanvasWidth()
     mat4 = [
