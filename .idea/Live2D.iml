@@ -2,7 +2,7 @@
 <module type="WEB_MODULE" version="4">
   <component name="FacetManager">
     <facet type="Python" name="Python facet">
-      <configuration sdkName="Python 3.12 virtualenv at C:\Users\ArcueidBrunestud\Desktop\Live2D\venv" />
+      <configuration sdkName="Python 3.12 virtualenv at D:\forDesktop\Live2D\venv" />
     </facet>
   </component>
   <component name="NewModuleRootManager">
@@ -15,6 +15,6 @@
     </content>
     <orderEntry type="jdk" jdkName="Python 3.12 (Live2D)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Python 3.12 virtualenv at C:\Users\ArcueidBrunestud\Desktop\Live2D\venv interpreter library" level="application" />
+    <orderEntry type="library" name="Python 3.12 virtualenv at D:\forDesktop\Live2D\venv interpreter library" level="application" />
   </component>
 </module>
