@@ -1,6 +1,9 @@
-﻿class UtString:
+﻿from typing import Union, List
+
+
+class UtString:
     @staticmethod
-    def startswith(s: str | bytes, offset: int, pat: str) -> bool:
+    def startswith(s: bytes, offset: int, pat: str) -> bool:
         end_pos = offset + len(pat)
         if end_pos >= len(s):
             return False
@@ -16,7 +19,7 @@
         return buf[offset:offset + size].decode("utf-8")
 
     @staticmethod
-    def strToFloat(s, length, offset, ret) -> float:
+    def strToFloat(s: bytes, length: int, offset: int, ret: List[bool]) -> float:
         result = 0
         _n = 10
         _p = False

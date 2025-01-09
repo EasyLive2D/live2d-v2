@@ -1,4 +1,10 @@
-﻿from .framework import L2DMatrix44
+﻿from typing import Tuple, TYPE_CHECKING
+
+from .framework import L2DMatrix44
+
+if TYPE_CHECKING:
+    from .framework.matrix import L2DModelMatrix
+
 
 
 class MatrixManager:
@@ -38,10 +44,10 @@ class MatrixManager:
             sh = abs(top - bottom)
             self.__screenToScene.multScale(sh / height, -sh / height)
 
-    def screenToScene(self, scr_x: float, scr_y: float) -> tuple[float, float]:
+    def screenToScene(self, scr_x: float, scr_y: float) -> Tuple[float, float]:
         return self.__screenToScene.transformX(scr_x), self.__screenToScene.transformY(scr_y)
 
-    def invertTransform(self, src_x, src_y) -> tuple[float, float]:
+    def invertTransform(self, src_x, src_y) -> Tuple[float, float]:
         return self.__projection.invertTransformX(src_x), self.__projection.invertTransformY(src_y)
 
     def setScale(self, scale: float):
@@ -51,16 +57,17 @@ class MatrixManager:
         self.__offsetX = dx
         self.__offsetY = dy
 
-    def getMvp(self, model_matrix) -> list:
+    def getMvp(self, model_matrix: 'L2DModelMatrix') -> list:
         self.__projection.identity()
 
         if self.__wh > self.__ww:
+            model_matrix.setWidth(2.0)
             self.__projection.multScale(1.0, self.__ww / self.__wh)
         else:
             self.__projection.multScale(self.__wh / self.__ww, 1.0)
 
         self.__projection.multScale(self.__scale, self.__scale)
-        self.__projection.multTranslate(self.__offsetX, self.__offsetY)
+        self.__projection.translate(self.__offsetX, self.__offsetY)
 
         self.__projection.mul(self.__projection.getArray(), model_matrix.getArray(), self.__projection.getArray())
         return self.__projection.getArray()

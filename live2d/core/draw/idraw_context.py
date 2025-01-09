@@ -1,14 +1,14 @@
-﻿from typing import TYPE_CHECKING
+﻿from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
-    from .mesh import Mesh
+    from mesh import Mesh
 
-class DrawContext:
+class IDrawContext:
 
-    def __init__(self, dd):
-        self.interpolatedDrawOrder = None
-        self.paramOutside = [False]
-        self.partsOpacity = 0
+    def __init__(self, dd: 'Mesh'):
+        self.interpolatedDrawOrder: Optional[int] = None
+        self.paramOutside: bool = False
+        self.partsOpacity: float = 0
         self.available = True
         self.baseOpacity = 1
         self.clipBufPre_clipContext = None
@@ -16,10 +16,10 @@ class DrawContext:
         self.partsIndex = -1
 
     def isParamOutside(self):
-        return self.paramOutside[0]
+        return self.paramOutside
 
     def isAvailable(self):
-        return self.available and not self.paramOutside[0]
+        return self.available and not self.paramOutside
 
     def getDrawData(self) -> 'Mesh':
         return self.drawData
