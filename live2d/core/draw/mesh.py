@@ -53,10 +53,6 @@ class Mesh(IDrawData):
     def getType(self):
         return IDrawData.TYPE_MESH
 
-    def initDirect(self):
-        self.pivotMgr = PivotManager()
-        self.pivotMgr.initDirect()
-
     def read(self, br):
         super().read(br)
         self.textureNo = br.readInt32()
@@ -130,7 +126,7 @@ class Mesh(IDrawData):
             return
 
         super().setupInterpolate(aJ, aK)
-        if aK.paramOutside:
+        if aK.paramOutside[0]:
             return
 
         aI = Mesh.paramOutside
@@ -143,7 +139,7 @@ class Mesh(IDrawData):
             raise RuntimeError("context not match")
 
         aL = False
-        if dc.paramOutside:
+        if dc.paramOutside[0]:
             aL = True
 
         if not aL:
@@ -171,14 +167,17 @@ class Mesh(IDrawData):
         if not (self == dctx.getDrawData()):
             raise RuntimeError("context not match")
 
-        if dctx.paramOutside:
+        if dctx.paramOutside[0]:
             return
 
         texNr = self.textureNo
         if texNr < 0:
             texNr = 1
 
-        opacity = self.getOpacity(dctx) * dctx.partsOpacity * dctx.baseOpacity
+        opacity = (self.getOpacity(dctx) *
+                    dctx.partsOpacity *
+                    dctx.baseOpacity)
+        # print("op1: ", opacity)
         vertices = dctx.transformedPoints if (dctx.transformedPoints is not None) else dctx.interpolatedPoints
         dp.setClipBufPre_clipContextForDraw(dctx.clipBufPre_clipContext)
         dp.setCulling(self.culling)

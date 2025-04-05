@@ -72,7 +72,9 @@ class DrawParamOpenGL(DrawParam):
         a2 = self.baseGreen * opacity
         a5 = self.baseBlue * opacity
         a7 = self.baseAlpha * opacity
+        # print("baseColor", a_w, a2, a5, a7)
         if self.clipBufPre_clipContextMask is not None:
+            # 根据蒙版进行裁剪
             gl.frontFace(gl.CCW)
             gl.useProgram(self.shaderProgram)
             self.vbo = bindOrCreateVBO(gl, self.vbo, vertexArray)
@@ -96,6 +98,7 @@ class DrawParamOpenGL(DrawParam):
             gl.uniform4f(self.u_screenColor_Loc, *screenColor)
             gl.uniform4f(self.u_multiplyColor_Loc, *multiplyColor)
         elif self.clipBufPre_clipContextDraw is not None:
+            # 绘制蒙版
             gl.useProgram(self.shaderProgramOff)
             self.vbo = bindOrCreateVBO(gl, self.vbo, vertexArray)
             self.ebo = bindOrCreateEBO(gl, self.ebo, indexArray)
@@ -147,21 +150,29 @@ class DrawParamOpenGL(DrawParam):
         dst_color = None
         dst_factor = None
 
-        if comp == Mesh.COLOR_COMPOSITION_NORMAL:
+        if self.clipBufPre_clipContextMask is not None:
             src_color = gl.ONE
             src_factor = gl.ONE_MINUS_SRC_ALPHA
             dst_color = gl.ONE
             dst_factor = gl.ONE_MINUS_SRC_ALPHA
-        elif comp == Mesh.COLOR_COMPOSITION_SCREEN:
-            src_color = gl.ONE
-            src_factor = gl.ONE
-            dst_color = gl.ZERO
-            dst_factor = gl.ONE
-        elif comp == Mesh.COLOR_COMPOSITION_MULTIPLY:
-            src_color = gl.DST_COLOR
-            src_factor = gl.ONE_MINUS_SRC_ALPHA
-            dst_color = gl.ZERO
-            dst_factor = gl.ONE
+        else:
+            if comp == Mesh.COLOR_COMPOSITION_NORMAL:
+                src_color = gl.ONE
+                src_factor = gl.ONE_MINUS_SRC_ALPHA
+                dst_color = gl.ONE
+                dst_factor = gl.ONE_MINUS_SRC_ALPHA
+            elif comp == Mesh.COLOR_COMPOSITION_SCREEN:
+                src_color = gl.ONE
+                src_factor = gl.ONE
+                dst_color = gl.ZERO
+                dst_factor = gl.ONE
+            elif comp == Mesh.COLOR_COMPOSITION_MULTIPLY:
+                src_color = gl.DST_COLOR
+                src_factor = gl.ONE_MINUS_SRC_ALPHA
+                dst_color = gl.ZERO
+                dst_factor = gl.ONE
+            else:
+                raise RuntimeError("unknown comp")
 
         gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD)
         gl.blendFuncSeparate(src_color, src_factor, dst_color, dst_factor)
@@ -241,20 +252,22 @@ class DrawParamOpenGL(DrawParam):
         if not self.shaderProgramOff:
             return False
 
-        aK = ("#version 330 core\n"
-              "layout(location = 0) in vec2 a_position;"
-              "layout(location = 1) in vec2 a_texCoord;"
-              "out vec2 v_texCoord;"
-              "out vec4 v_clipPos;"
+        aK = ("#version 120\n"
+              "attribute vec2 a_position;"
+              "attribute vec2 a_texCoord;"
+              "varying vec2 v_texCoord;"
+              "varying vec4 v_clipPos;"
               "uniform mat4 u_mvpMatrix;"
               "void main(){"
               "    gl_Position = u_mvpMatrix * vec4(a_position, 0.0, 1.0);"
               "    v_clipPos = gl_Position;"
               "    v_texCoord = a_texCoord;"
-              "    v_texCoord.y = 1.0 - v_texCoord.y;}")
-        aM = ("#version 330 core\n"
-              "in vec2       v_texCoord;"
-              "in vec4       v_clipPos;"
+              "    v_texCoord.y = 1.0 - v_texCoord.y;"
+              "}")
+        aM = ("#version 120\n"
+              "precision mediump float;"
+              "varying vec2       v_texCoord;"
+              "varying vec4       v_clipPos;"
               "uniform sampler2D  s_texture0;"
               "uniform vec4       u_channelFlag;"
               "uniform vec4       u_baseColor;"
@@ -269,20 +282,20 @@ class DrawParamOpenGL(DrawParam):
               "          * step(u_baseColor.y, v_clipPos.y/v_clipPos.w)"
               "          * step(v_clipPos.x/v_clipPos.w, u_baseColor.z)"
               "          * step(v_clipPos.y/v_clipPos.w, u_baseColor.w);"
-              "        smpColor = u_channelFlag * texture(s_texture0, v_texCoord).a * isInside;"
+              "        smpColor = u_channelFlag * texture2D(s_texture0, v_texCoord).a * isInside;"
               "    }else{"
-              "        smpColor = texture(s_texture0 , v_texCoord);"
+              "        smpColor = texture2D(s_texture0 , v_texCoord);"
+              "        smpColor.rgb = smpColor.rgb * smpColor.a;"
               "        smpColor.rgb = smpColor.rgb * u_multiplyColor.rgb;"
               "        smpColor.rgb = smpColor.rgb + u_screenColor.rgb - (smpColor.rgb * u_screenColor.rgb);"
               "        smpColor = smpColor * u_baseColor;"
-              "        smpColor = vec4(smpColor.rgb * smpColor.a, smpColor.a);"
               "    }"
               "    gl_FragColor = smpColor;}")
-        aL = ("#version 330 core\n"
-              "layout(location = 0) in vec2     a_position;"
-              "layout(location = 1) in vec2     a_texCoord;"
-              "out vec2       v_texCoord;"
-              "out vec4       v_clipPos;"
+        aL = ("#version 120\n"
+              "attribute vec2     a_position;"
+              "attribute vec2     a_texCoord;"
+              "varying vec2       v_texCoord;"
+              "varying vec4       v_clipPos;"
               "uniform mat4       u_mvpMatrix;"
               "uniform mat4       u_clipMatrix;"
               "void main(){"
@@ -290,10 +303,13 @@ class DrawParamOpenGL(DrawParam):
               "    gl_Position = u_mvpMatrix * pos;"
               "    v_clipPos = u_clipMatrix * pos;"
               "    v_texCoord = a_texCoord;"
-              "    v_texCoord.y = 1.0 - v_texCoord.y;}")
-        aJ = ("#version 330 core\n"
-              "in vec2       v_texCoord;"
-              "in vec4       v_clipPos;"
+              "    v_texCoord.y = 1.0 - v_texCoord.y;"
+              "}"
+              )
+        aJ = ("#version 120\n"
+              "precision mediump float;"
+              "varying   vec2   v_texCoord;"
+              "varying   vec4   v_clipPos;"
               "uniform sampler2D  s_texture0;"
               "uniform sampler2D  s_texture1;"
               "uniform vec4       u_channelFlag;"
@@ -301,12 +317,12 @@ class DrawParamOpenGL(DrawParam):
               "uniform vec4       u_screenColor;"
               "uniform vec4       u_multiplyColor;"
               "void main(){"
-              "    vec4 col_formask = texture(s_texture0, v_texCoord);"
+              "    vec4 col_formask = texture2D(s_texture0, v_texCoord);"
               "    col_formask.rgb = col_formask.rgb * u_multiplyColor.rgb;"
               "    col_formask.rgb = col_formask.rgb + u_screenColor.rgb - (col_formask.rgb * u_screenColor.rgb);"
               "    col_formask = col_formask * u_baseColor;"
               "    col_formask.rgb = col_formask.rgb * col_formask.a;"
-              "    vec4 clipMask = texture(s_texture1, v_clipPos.xy / v_clipPos.w) * u_channelFlag;"
+              "    vec4 clipMask = texture2D(s_texture1, v_clipPos.xy / v_clipPos.w) * u_channelFlag;"
               "    float maskVal = clipMask.r + clipMask.g + clipMask.b + clipMask.a;"
               "    col_formask = col_formask * maskVal;"
               "    gl_FragColor = col_formask;}")

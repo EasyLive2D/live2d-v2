@@ -7,7 +7,7 @@ from ..util import UtInterpolate
 
 
 class WarpDeformer(Deformer):
-    gT_ = [False]
+    paramOutSide = [False]
 
     def __init__(self):
         super().__init__()
@@ -15,10 +15,6 @@ class WarpDeformer(Deformer):
         self.col = 0
         self.pivotMgr = None
         self.pivotPoints = None
-
-    def initDirect(self):
-        self.pivotMgr = PivotManager()
-        self.pivotMgr.initDirect()
 
     def read(self, br):
         super().read(br)
@@ -50,8 +46,8 @@ class WarpDeformer(Deformer):
         if not self.pivotMgr.checkParamUpdated(modelContext):
             return
 
-        aL = self.VT_()
-        aH = WarpDeformer.gT_
+        aL = self.getPointCount()
+        aH = WarpDeformer.paramOutSide
         aH[0] = False
         UtInterpolate.interpolatePoints(modelContext, self.pivotMgr, aH, aL, self.pivotPoints, aK.interpolatedPoints, 0,
                                         2)
@@ -80,7 +76,7 @@ class WarpDeformer(Deformer):
                     aL.setTotalScale_notForClient(aM)
                     aO = aI.getTotalOpacity()
                     aL.setTotalOpacity(aO * aL.getInterpolatedOpacity())
-                    aN.transformPoints(modelContext, aI, aL.interpolatedPoints, aL.transformedPoints, self.VT_(), 0, 2)
+                    aN.transformPoints(modelContext, aI, aL.interpolatedPoints, aL.transformedPoints, self.getPointCount(), 0, 2)
                     aL.setAvailable(True)
                 else:
                     aL.setAvailable(False)
@@ -90,7 +86,7 @@ class WarpDeformer(Deformer):
         WarpDeformer.transformPoints_sdk2(srcPoints, dstPoints, numPoint, ptOffset, ptStep, pivot_points, self.row,
                                           self.col)
 
-    def VT_(self):
+    def getPointCount(self):
         return (self.row + 1) * (self.col + 1)
 
     def getType(self):

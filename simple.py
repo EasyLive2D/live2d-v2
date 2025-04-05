@@ -36,7 +36,7 @@ def loadImage(filePath):
     return texture
 
 
-name = "kasumi"
+name = "touru"
 modelDef = ModelDef(
     f"./test-data/{name}.moc",
     [f"./test-data/{name}.png"]
